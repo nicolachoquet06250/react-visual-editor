@@ -1,13 +1,11 @@
 import './index.css';
 import {createUseStyles} from 'react-jss';
-import {Button} from '../../utilities/ui/forms';
 import {FaIcon} from '../../../enums/icons';
 import { useComponents, useModal } from '../../../hooks';
 import {useToggle} from 'react-use';
 import { AddComponentModalButton } from "../../modals/add-component";
-import { FlexBox, SimpleBox } from "../../utilities/ui/boxes";
-import { Col, Container, Row } from "../../utilities/grid";
 import { Modals } from "../../../enums";
+import { Card, Col, Container, Row, Button } from 'react-bootstrap';
 
 const useStyles = createUseStyles({
     header: {
@@ -25,18 +23,13 @@ const useStyles = createUseStyles({
         },
 
         '& button': {
-            width: '30px',
-            height: '30px',
             borderRadius: '30px',
-            background: 'white',
-            border: '1px solid black',
-            cursor: 'pointer'
+            transition: 'background-color .2s ease-out, opacity .2s ease-out'
         }
     },
 
     openCloseButton: {
         border: '1px solid black',
-        padding: '5px',
         position: 'absolute',
         top: '5px',
         right: 0,
@@ -62,40 +55,6 @@ const useStyles = createUseStyles({
         padding: '5px'
     },
 
-    componentBuilderCard: {
-        display: 'flex',
-        flexDirection: 'column',
-        justifyContent: 'flex-start',
-        alignItems: 'flex-start',
-        border: '1px solid lightblue',
-        borderRadius: '5px',
-        backgroundColor: 'rgb(255, 255, 255)',
-        transition: 'background-color .2s ease-out',
-
-        '& > header': {
-            cursor: 'pointer',
-            height: '40px',
-            width: '100%',
-            display: 'flex',
-            flexDirection: 'row',
-            justifyContent: 'space-between',
-            alignItems: 'center'
-        },
-
-        '& > main': {
-            display: 'none'
-        },
-
-        '&.opened > main': {
-            width: '100%',
-            display: 'flex'
-        },
-
-        '&:hover': {
-            backgroundColor: 'rgba(0, 0, 0, .3)'
-        }
-    },
-
     footer: {
         height: '50px',
         width: '100%',
@@ -114,7 +73,7 @@ const useStyles = createUseStyles({
 export const VisualEditorSidebar = ({onClose, onOpen, onSend}) => {
     const {pageComponents: components, setData, unregisterFromPage: unregisterComponent} = useComponents();
 
-    const {header, main, footer, openCloseButton, componentBuilderCard} = useStyles();
+    const {header, main, footer, openCloseButton} = useStyles();
 
     const [isOpened, toggleOpened] = useToggle(true);
     const {open} = useModal(Modals.ValidateData);
@@ -162,66 +121,59 @@ export const VisualEditorSidebar = ({onClose, onOpen, onSend}) => {
         <>
             <header className={header}>
                 <div>
-                    <AddComponentModalButton circle={true} icon={FaIcon.PLUS} />
+                    <AddComponentModalButton />
                 </div>
 
                 <Button className={openCloseButton + ` ${isOpened ? 'open' : 'close'}`}
-                        circle={true}
-                        icon={isOpened ? FaIcon.LOCK : FaIcon.LOCK_OPEN}
-                        onClick={handleToggleSidebar} />
+                        size={'sm'}
+                        variant={'outline-dark'}
+                        onClick={handleToggleSidebar}>
+                    <i className={isOpened ? FaIcon.LOCK : FaIcon.LOCK_OPEN} />
+                </Button>
             </header>
 
             <main className={main}>
                 {components.map((builderComponent, i) => {
                     return (
-                        <section className={componentBuilderCard} key={'sidebar-section-' + i}>
-                            <header onClick={toggleOpenCard}>
-                                <SimpleBox px={5}>
-                                    <Container>
-                                        <Row>
-                                            <Col>
-                                                <FlexBox alignItems={'center'}>
-                                                    <h5>{builderComponent.title}</h5>
-                                                </FlexBox>
-                                            </Col>
+                        <Card key={'builder-component-' + i}>
+                            <Card.Header onClick={toggleOpenCard} >
+                                <Container>
+                                    <Row>
+                                        <Col>
+                                            <Card.Title>{builderComponent.title}</Card.Title>
+                                        </Col>
+                                        <Col sm={2}>
+                                            <Button variant={'danger'}
+                                                    onClick={() => handleDeleteComponent(i)}>
+                                                <i className={FaIcon.TRASH} />
+                                            </Button>
+                                        </Col>
+                                    </Row>
+                                </Container>
+                            </Card.Header>
+                            
+                            <Card.Body style={{ padding: '5px' }}>
+                                {(() => {
+                                    const Component = builderComponent.builderComponent;
 
-                                            <Col>
-                                                <FlexBox alignItems={'center'}
-                                                         justifyContent={'flex-end'}>
-                                                    <Button circle={true}
-                                                            icon={FaIcon.TRASH}
-                                                            noBorder={true}
-                                                            activeColor={'red'}
-                                                            onClick={() => handleDeleteComponent(i)} />
-                                                </FlexBox>
-                                            </Col>
-                                        </Row>
-                                    </Container>
-                                </SimpleBox>
-                            </header>
-
-                            <main>
-                                <SimpleBox px={5} py={5}>
-                                    {(() => {
-                                        const Component = builderComponent.builderComponent;
-
-                                        return (<Component {...builderComponent.data} onSend={e => sendComponentData(i, e)} />);
-                                    })()}
-                                </SimpleBox>
-                            </main>
-                        </section>
-                    )
+                                    return (<Component {...builderComponent.data} onSend={e => sendComponentData(i, e)} />);
+                                })()}
+                            </Card.Body>
+                        </Card>
+                    );
                 })}
             </main>
 
             <footer className={footer}>
-                <Button circle={false}
-                        icon={FaIcon.EXPORT}
-                        onClick={handleExport}> Export</Button>
+                <Button variant={'outline-dark'}
+                        onClick={handleExport}> 
+                    <i className={FaIcon.EXPORT} /> Export
+                </Button>
 
-                <Button circle={true}
-                        icon={FaIcon.SEND}
-                        onClick={handleSend} />
+                <Button variant={'outline-dark'}
+                        onClick={handleSend}>
+                    <i className={FaIcon.SEND} />
+                </Button>
             </footer>
         </>
     )

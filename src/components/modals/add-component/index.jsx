@@ -1,5 +1,5 @@
 import { Modal } from "../../utilities/ui/modals";
-import { Button } from "../../utilities/ui/forms";
+import { Button, Nav } from "react-bootstrap";
 import { useComponents, useModal } from "../../../hooks";
 import { Modals } from "../../../enums";
 import { useContextTabs } from "../../utilities/ui/tabs";
@@ -7,13 +7,28 @@ import { FaIcon } from "../../../enums/icons";
 import { Col, Container, Row } from "../../utilities/grid";
 import { Fragment, useEffect, useState } from "react";
 import { FlexBox } from "../../utilities/ui/boxes";
+import { createUseStyles } from "react-jss";
+
+const useStyles = createUseStyles({
+    modal: {
+        '& [class^=container-]': {
+            paddingTop: '15px',
+            paddingBottom: '15px',
+            paddingLeft: '15px',
+            border: '1px solid #DEE2E6',
+            borderBottomLeftRadius: '5px',
+            borderBottomRightRadius: '5px'
+        }
+    }
+});
 
 const AddComponentModalHeader = () => (<h2>Ajouter un composant</h2>);
 
 export const AddComponentModal = () => {
+    const {modal} = useStyles();
     const {Tabs, Tab, Content} = useContextTabs();
     const {components, pageComponents, registerInPage} = useComponents();
-    const [currentTab, setCurrentTab] = useState('');
+    const [currentTab, setCurrentTab] = useState('all');
     const {close} = useModal(Modals.AddComponent);
 
     const categoryList = [
@@ -63,70 +78,71 @@ export const AddComponentModal = () => {
 
     return (
         <Modal header={() => <AddComponentModalHeader />}
-               name={Modals.AddComponent}>
-            <Tabs onChange={setCurrentTab}>
+               name={Modals.AddComponent}
+               className={modal}>
+
+            <Nav justify variant="tabs" defaultActiveKey="all">
                 {categoryList.map((cat, i) => (
-                    <Tab target={cat.slug}
-                         key={'tab-' + i}
-                         icon={cat.slug === 'all' ? FaIcon.GLOBE : false}>
-                        {cat.name}
-                    </Tab>
+                    <Nav.Item key={'nav-item-' + i}>
+                        <Nav.Link href={cat.slug} 
+                                  key={'tab-' + i} 
+                                  onClick={e => {
+                                      e.preventDefault(); 
+                                      setCurrentTab(cat.slug)
+                                  }}>
+                            {cat.slug === 'all' ? (<i className={FaIcon.GLOBE} />) : cat.name}
+                        </Nav.Link>
+                    </Nav.Item>
                 ))}
+            </Nav>
+            
+            <Container>
+                {componentList.map((row, j) => (
+                    <Row key={'row-' + j}>
+                        {row.map((component, i) => (
+                            <Fragment key={'frag-' + i}>
+                                {row.length === 1 && (<Col key={'col-' + i}>
+                                    <Button variant={'outline-secondary'}
+                                            onMouseOver={e => e.target.querySelector('img') && (e.target.querySelector('img').style.height = '55px')}
+                                            onMouseOut={e => e.target.querySelector('img') && (e.target.querySelector('img').style.height = '50px')}
+                                            onClick={() => createComponent(component.title)}>
+                                        <FlexBox direction={'column'}
+                                                 justifyContent={'space-between'}
+                                                 alignItems={'center'}>
+                                            <img src={component.imagePreview}
+                                                 alt={`component "${component.title}" preview`}
+                                                 style={{height: '50px', transition: 'height .2s ease-out'}}
+                                                 onMouseOver={e => e.target && (e.target.style.height = '55px')}
+                                                 onMouseOut={e => e.target && (e.target.style.height = '55px')} />
 
-                <Content>
-                    <Container>
-                        {componentList.map((row, j) => (
-                            <Row key={'row-' + j}>
-                                {row.map((component, i) => (
-                                    <Fragment key={'frag-' + i}>
-                                        {row.length === 1 && (<Col key={'col-' + i}>
-                                            <Button activeColor={'rgba(0, 0, 0, .5)'}
-                                                    onMouseOver={e => e.target.querySelector('img') && (e.target.querySelector('img').style.height = '55px')}
-                                                    onMouseOut={e => e.target.querySelector('img') && (e.target.querySelector('img').style.height = '50px')}
-                                                    onClick={() => createComponent(component.title)}>
-                                                <FlexBox direction={'column'}
-                                                         justifyContent={'space-between'}
-                                                         alignItems={'center'}>
-                                                    <img src={component.imagePreview}
-                                                         alt={`component "${component.title}" preview`}
-                                                         style={{height: '50px', transition: 'height .2s ease-out'}}
-                                                         onMouseOver={e => e.target && (e.target.style.height = '55px')}
-                                                         onMouseOut={e => e.target && (e.target.style.height = '55px')} />
+                                            {component.title}
+                                        </FlexBox>
+                                    </Button>
+                                </Col>)}
 
-                                                    {component.title}
-                                                </FlexBox>
-                                            </Button>
-                                        </Col>)}
+                                {row.length > 1 && (<Col>
+                                    <Button variant={'outline-secondary'}
+                                            onMouseOver={e => e.target.querySelector('img') && (e.target.querySelector('img').style.height = '55px')}
+                                            onMouseOut={e => e.target.querySelector('img') && (e.target.querySelector('img').style.height = '50px')}
+                                            onClick={() => createComponent(component.title)}>
+                                        <FlexBox direction={'column'}
+                                                 justifyContent={'space-between'}
+                                                 alignItems={'center'}>
+                                            <img src={component.imagePreview}
+                                                 alt={`component "${component.title}" preview`}
+                                                 style={{height: '50px', transition: 'height .2s ease-out'}}
+                                                 onMouseOver={e => e.target && (e.target.style.height = '55px')}
+                                                 onMouseOut={e => e.target && (e.target.style.height = '55px')} />
 
-                                        {row.length > 1 && (<Col>
-                                            <Button noBorder={true}
-                                                    activeColor={'rgba(0, 0, 0, .5)'}
-                                                    onMouseOver={e => e.target.querySelector('img') && (e.target.querySelector('img').style.height = '55px')}
-                                                    onMouseOut={e => e.target.querySelector('img') && (e.target.querySelector('img').style.height = '50px')}
-                                                    onClick={() => createComponent(component.title)}>
-                                                <FlexBox direction={'column'}
-                                                         justifyContent={'space-between'}
-                                                         alignItems={'center'}>
-                                                    <img src={component.imagePreview}
-                                                         alt={`component "${component.title}" preview`}
-                                                         onMouseOver={e => e.target && (e.target.style.height = '55px')}
-                                                         onMouseOut={e => e.target && (e.target.style.height = '55px')} />
-
-                                                    {component.title}
-                                                </FlexBox>
-                                            </Button>
-                                        </Col>)}
-                                    </Fragment>
-                                ))}
-                            </Row>
+                                            {component.title}
+                                        </FlexBox>
+                                    </Button>
+                                </Col>)}
+                            </Fragment>
                         ))}
-                    </Container>
-                </Content>
-            </Tabs>
-
-            <div>
-                toto
-            </div>
+                    </Row>
+                ))}
+            </Container>
         </Modal>
     )
 };
@@ -136,12 +152,14 @@ export const AddComponentModal = () => {
  * @returns {JSX.Element}
  * @constructor
  */
-export const AddComponentModalButton = (props) => {
+export const AddComponentModalButton = () => {
     const {open} = useModal(Modals.AddComponent);
 
     return (
-        <Button onClick={open} {...props}>
-            {props.children}
+        <Button variant={'outline-dark'} 
+                size={'sm'} 
+                onClick={open}>
+            <i className={FaIcon.PLUS} />
         </Button>
     );
 };

@@ -1,18 +1,21 @@
 import { SimpleBox } from "../../boxes";
-import { Col, Container, Row } from "../../../grid";
-import { useContextDropdown } from "../../forms";
+import { Col, Container, Row, DropdownButton, Dropdown, ButtonGroup } from "react-bootstrap";
 import { useEffect, useState } from "react";
 import { useComponents } from "../../../../../hooks";
 
 export const ComponentList = ({defaultComponent, onSend}) => {
-	const {Dropdown, Option} = useContextDropdown();
 	const {components} = useComponents();
 
-	const [chosenComponent, setChosenComponent] = useState(defaultComponent?.slug ?? components.reduce((r, c) => !r && !c.recursive ? c.slug : r, ''));
+	const [chosenComponent, setChosenComponent] = useState('');
 	const [chosenComponentData, setChosenComponentData] = useState();
 
 	const chosenComponentTitle = components.reduce((r, c) => c.slug === chosenComponent ? c.title : r, 'None');
 	const ChosenBuilderComponent = components.reduce((r, c) => c.slug === chosenComponent ? c.builderComponent : r, null);
+
+	useEffect(() => {
+		setChosenComponent(defaultComponent?.slug ?? components.reduce((r, c) => !r && !c.recursive ? c.slug : r, ''));
+		console.log(chosenComponent, chosenComponentTitle, defaultComponent?.slug, components.reduce((r, c) => !r && !c.recursive ? c.slug : r, ''), (defaultComponent?.slug ?? components.reduce((r, c) => !r && !c.recursive ? c.slug : r, '')));
+	}, []);
 
 	const sendData = () => {
 		onSend({
@@ -42,24 +45,24 @@ export const ComponentList = ({defaultComponent, onSend}) => {
 			<Container>
 				<Row>
 					<Col>
-						<Dropdown value={chosenComponent}
-						          label={chosenComponentTitle}
-						          onChange={({value}) => {
-									  setChosenComponent(value);
-							          sendData();
-						          }}>
+						<DropdownButton as={ButtonGroup} 
+										id={`dropdown-secondary`}
+										variant={'outline-secondary'} 
+										title={chosenComponentTitle}>
 							{components.map((component, i) => (
-								<Option target={component.slug}>
+								<Dropdown.Item eventKey={component.slug}
+											   onClick={() => setChosenComponent(component.slug)}
+											   key={'dropdown-item-' + i}>
 									{component.title}
-								</Option>
+								</Dropdown.Item>
 							))}
-						</Dropdown>
+						</DropdownButton>
 					</Col>
 				</Row>
 
 				<Row>
 					<Col>
-						<ChosenBuilderComponent data={chosenComponentData} onSend={handleSend} />
+						{ChosenBuilderComponent && (<ChosenBuilderComponent data={chosenComponentData} onSend={handleSend} />)}
 					</Col>
 				</Row>
 			</Container>

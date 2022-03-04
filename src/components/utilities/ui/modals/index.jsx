@@ -3,6 +3,7 @@ import { createUseStyles } from "react-jss";
 import { useModal } from "../../../../hooks";
 import { useEffect, useRef } from "react";
 import { useClickAway, useKey } from "react-use";
+import { Modal as BSModal } from 'react-bootstrap';
 
 const useStyles = createUseStyles({
 	modal: {
@@ -81,40 +82,28 @@ const useStyles = createUseStyles({
 	}
 });
 
-export const Modal = ({header, footer, children, name}) => {
-	const {modal: modalStyle} = useStyles();
-
+export const Modal = ({header, footer, children, name, className = {}}) => {
 	const {opened, close} = useModal(name);
 
 	const [Header, Footer] = [header, footer];
 
-	const modalContent = useRef();
-
-	useClickAway(modalContent, close);
-
 	useKey('Escape', close);
 
-	return (<div className={modalStyle + ` ${!opened ? 'closed' : ''}`}>
-		<div className={'modal'} ref={modalContent}>
-			<header className={`${!header ? 'not-header' : ''}`}>
+	return (
+		<BSModal size={"lg"} show={opened} onHide={close} centered className={className}>
+			<BSModal.Header closeButton>
 				{header && (<div>
 					<Header />
 				</div>)}
+			</BSModal.Header>
 
-				<Button circle={true}
-				        noBorder={true}
-				        close={true}
-				        activeColor={'red'}
-				        onClick={close} />
-			</header>
-
-			<main>
+			<BSModal.Body>
 				{children}
-			</main>
+			</BSModal.Body>
 
-			{footer && (<footer>
+			{footer && (<BSModal.Footer>
 				<Footer />
-			</footer>)}
-		</div>
-	</div>);
+			</BSModal.Footer>)}
+		</BSModal>
+	);
 };

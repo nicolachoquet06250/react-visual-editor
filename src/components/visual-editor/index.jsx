@@ -1,9 +1,11 @@
 import {createUseStyles} from 'react-jss';
-import {useState, useReducer} from 'react';
+import {useState, useReducer, useRef, useEffect} from 'react';
 import {VisualEditorSidebar} from './sidebar';
 import {VisualEditorContent} from './content';
 import {visualEditorState, VisualEditorState, VisualEditorStateDispatcher} from '../../context';
 import { AddComponentModal } from "../modals/add-component";
+import 'bootstrap/dist/css/bootstrap.min.css';
+import { useMouse, useToggle, useWindowSize } from 'react-use';
 
 const useStyles = createUseStyles({
     visualEditor: {
@@ -31,11 +33,26 @@ const useStyles = createUseStyles({
         '&.closed': {
             transform: 'translateX(-100%)',
 
-            '& + section': {
+            '& ~ section': {
                 width: '100%!important',
                 height: '100vh',
                 transform: `translateX(-${props?.minSidebarWidth ?? '0px'})`
+            },
+
+            '& > .sidebar-resizer': {
+                display: 'none'
             }
+        },
+
+        '& > .sidebar-resizer': {
+            position: 'absolute',
+            //background: 'red',
+            right: '0',
+            top: 0,
+            bottom: 0,
+            width: '10px',
+            transform: 'translateX(50%)',
+            cursor: 'e-resize'
         }
     }),
 
@@ -52,6 +69,11 @@ export const VisualEditor = ({ layout, registerer, onSend }) => {
     const Registerer = registerer;
 
     const [closed, setClosed] = useState(false);
+    const [sidebarWidth, setSidebarWidth] = useState(300);
+    const [resizeState, setResizeState] = useState(false);
+    const [sidebarWidthSaved, setSidebarWidthSaved] = useState(true);
+    const [savedSidebarWidth, setSavedSidebarWidth] = useState(sidebarWidth)
+    const {height: pageHeight, width: pageWidth} = useWindowSize();
 
     const {visualEditor, sidebar, content} = useStyles({
         minSidebarWidth: '300px', cssResizerWidth: '300px'
@@ -69,14 +91,43 @@ export const VisualEditor = ({ layout, registerer, onSend }) => {
         visualEditorState
     );
 
+    const veRef = useRef();
+
+    const sidebarRef = useRef();
+    const {docX} = useMouse(veRef);
+
+    /*useEffect(() => {
+        if (resizeState) {
+            setSidebarWidthSaved(false);
+            console.log('savedSidebarWidth', savedSidebarWidth, 'docX', docX)
+            setSidebarWidth(savedSidebarWidth + ((docX - savedSidebarWidth) * 2));
+            if (sidebarWidth < 300) {
+                setSidebarWidth(300);
+            }
+            console.log('sidebarWidth', sidebarWidth)
+            console.log(docX)
+        } else {
+            if (!sidebarWidthSaved) {
+                setSidebarWidthSaved(true);
+                setSavedSidebarWidth(sidebarWidth);
+                console.log('savedSidebarWidth', savedSidebarWidth)
+            }
+        }
+    }, [docX]);*/
+
     return (
         <VisualEditorState.Provider value={state}>
             <VisualEditorStateDispatcher.Provider value={dispatch}>
                 <Registerer />
 
-                <main className={visualEditor}>
-                    <aside className={sidebar + ' ' + (closed ? 'closed' : '')}>
+                <main className={visualEditor} ref={veRef} onMouseUp={() => setResizeState(false)}>
+                    <aside className={sidebar + ' ' + (closed ? 'closed' : '')}
+                            style={{width: sidebarWidth + 'px', height: pageHeight + 'px'}}
+                            ref={sidebarRef}>
                         <VisualEditorSidebar onOpen={onOpen} onClose={onClose} onSend={onSend} />
+
+                        <div className={'sidebar-resizer'} 
+                             onMouseDown={() => setResizeState(true)}></div>
                     </aside>
 
                     <section className={content}>

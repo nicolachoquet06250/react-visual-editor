@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useReducer, useState } from 'react';
+import { createContext, useContext, useEffect, useReducer, useRef, useState } from 'react';
 import { createUseStyles } from 'react-jss';
 import { useFirstMountState, useToggle } from 'react-use';
 import {Button} from '../buttons';
@@ -77,6 +77,7 @@ export const useContextDropdown = () => {
     return {
         Dropdown({label, value, onChange, children}) {
             const {dropdown, optionContainer} = useStyles();
+            const options = useRef();
 
             useEffect(() => {
                 (dropdownValue === '') && (() => {
@@ -85,11 +86,10 @@ export const useContextDropdown = () => {
                 })()
             }, [])
 
-            const [opened, setOpened] = useState(false);
             const firstLoaded = useFirstMountState();
 
             useEffect(() => {
-                !firstLoaded && setOpened(!opened);
+                !firstLoaded && (options.current.classList.contains('show') ? options.current.classList.remove('show') : options.current.classList.remove('show'));
                 dropdownValue && onChange({
                     value: dropdownValue,
                     label: dropdownLabel
@@ -104,16 +104,16 @@ export const useContextDropdown = () => {
                             aria-haspopup={'true'}
                             aria-expanded={'false'}
                             onClick={() => {
-                                setOpened(!opened)
-                                console.log(opened)
+                                options.current.classList.contains('show') ? options.current.classList.remove('show') : options.current.classList.remove('show');
                             }}>
                         {dropdownLabel}
 
                         <i className={FaIcon.DROPDOWN_ARROW} />
                     </Button>
 
-                    <div className={optionContainer + ` dropdown-menu ${opened ? 'show' : ''}`}
-                         aria-labelledby={'dropdownMenuButton'}>
+                    <div className={optionContainer + ` dropdown-menu`}
+                         aria-labelledby={'dropdownMenuButton'} 
+                         ref={options}>
                         {children}
                     </div>
                 </div>
@@ -129,6 +129,8 @@ export const useContextDropdown = () => {
                 setDropdownValue(target);
                 setDropdownLabel(children);
             }
+
+            console.log(children)
 
             return (
                 <a href="#"

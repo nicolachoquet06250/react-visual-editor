@@ -68,7 +68,7 @@ export const useComponents = () => {
         },
 
         registerInPage(title, defaultData = {}) {
-            const index = state.components.reduce((r, c) => c.title, []).indexOf(title);
+            const index = state.components.map(c => c.title).indexOf(title);
 
             setPageComponents([
                 ...state.pageComponents,

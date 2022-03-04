@@ -1,7 +1,7 @@
 import {useEffect, useState} from "react";
 import {createUseStyles} from "react-jss";
-import {Container, Row, Col} from '../../grid';
-import {Button} from "../forms";
+import {Container, Row, Col} from 'react-bootstrap';
+import {Button} from "react-bootstrap";
 
 const useStyles = createUseStyles({
     flexbox: ({justifyContent, alignItems, direction: flexDirection}) => ({
@@ -53,24 +53,13 @@ export const FlexBox = ({children, justifyContent, alignItems, direction}) => {
     );
 };
 
-export const Repeater = ({title, addLabel, value, onUpdate, onChange, voidModel, child}) => {
-    const [values, setValues] = useState((value ?? []));
-
+export const Repeater = ({title, addLabel, value, onChange, voidModel, children}) => {
     const handleAdd = () => {
-        onUpdate([
-            ...values,
-            voidModel
-        ]);
-        onChange([
-            ...values,
+        onChange && onChange([
+            ...value,
             voidModel
         ]);
     };
-
-    useEffect(() => {
-        setValues(value);
-        onChange(values);
-    }, [value])
 
     return (
         <Container>
@@ -82,14 +71,13 @@ export const Repeater = ({title, addLabel, value, onUpdate, onChange, voidModel,
                 </Col>
             </Row>
 
-            {values.map((_, i) => {
-                const Child = child;
-                return <Child i={i} onChange={() => onChange(values)} key={'repeater-index-' + i} onDelete={() => onChange(values.reduce((r, c, index) => i === index ? r : [...r, c], []))} />
-            })}
+            {children}
 
             <Row>
-                <Col style={'display: flex; justify-content: flex-end'}>
-                    <Button onClick={handleAdd}>
+                <Col style={{ textAlign: 'right' }}>
+                    <Button variant={'outline-dark'} 
+                            onClick={handleAdd} 
+                            style={{ marginRight: 0 }}>
                         {addLabel}
                     </Button>
                 </Col>

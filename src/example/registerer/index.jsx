@@ -1,6 +1,6 @@
 import { useComponents } from "../../hooks";
 import Preview from "../../logo.svg";
-import {MyComponent as MyBuilderComponent} from '../builder';
+import {MyComponent as MyBuilderComponent, MySecondComponent as MySecondBuilderComponent} from '../builder';
 import {MyComponent as MyUIComponent} from '../ui';
 
 export const VisualEditorComponentsRegisterer = () => {
@@ -11,8 +11,18 @@ export const VisualEditorComponentsRegisterer = () => {
 		category: 'Test',
 		data: {},
 		imagePreview: Preview,
-		recursive: false,
+		recursive: true,
 		builderComponent: MyBuilderComponent,
+		uiComponent: MyUIComponent
+	});
+
+	register({
+		title: 'Mon 2em composant',
+		category: 'Test',
+		data: {},
+		imagePreview: Preview,
+		recursive: false,
+		builderComponent: MySecondBuilderComponent,
 		uiComponent: MyUIComponent
 	});
 
