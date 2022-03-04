@@ -150,10 +150,10 @@ export const MyComponent = ({text, select, texts, selected, component}) => {
 					</Container>
 				</SimpleBox>
 
-				<ComponentList defaultComponent={_component} onSend={e => {
+				{/*<ComponentList defaultComponent={_component} onSend={e => {
 					setComponent(e);
 					sendData();
-				}} />
+				}} />*/}
 			</SimpleBox>
 		</div>
 	);
