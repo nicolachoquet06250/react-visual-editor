@@ -1,56 +1,60 @@
-import { useState } from "react";
 import {useGlobalState} from "./context";
+import { useEffect } from "react";
 
 /**
- * 
+ * @typedef {{ title: String, category: String, builderComponent: Function, uiComponent: Function, data: Record<string, any>, imagePreview: string, recursive: boolean }} CustomComponent
+ * @typedef {CustomComponent[]} CustomComponentList
+ * @typedef {Record<string, any>} CustomComponentData
+ *
  * @returns {{
- *      components: { title: String, category: String, builderComponent: import("react").ComponentElement, uiComponent: import("react").ComponentElement, data: Record<string, any>, imagePreview: string }[], 
- *      pageComponents: { title: String, category: String, builderComponent: import("react").ComponentElement, uiComponent: import("react").ComponentElement, data: Record<string, any>, imagePreview: string }[],
- *      register: (component: { title: String, category: String, builderComponent: import("react").ComponentElement, uiComponent: import("react").ComponentElement, data: Record<string, any>, imagePreview: string }) => void,
- *      setData(index: number, data: Record<string, any>) => void,
- *      registerInPage: (title: string, defaultData: Record<string, any>) => void,
- *      unregisterFromPage: (index: number) => void
+ * components: CustomComponentList,
+ * pageComponents: CustomComponentList,
+ * register: (component: CustomComponent) => void,
+ * setData: (index: number, data: CustomComponentData) => void,
+ * registerInPage: (title: string, defaultData: CustomComponentData) => void,
+ * unregisterFromPage: (index: number) => void
  * }}
  */
 export const useComponents = () => {
     const [state, dispatch] = useGlobalState();
 
     const setComponents = (components) => {
-        dispatch({
-            ...state,
-            components
-        });
+        if (dispatch) {
+            dispatch({
+                ...state,
+                components
+            });
+        }
     };
 
-    const setTitles = (titles) => {
-        dispatch({
-            ...state,
-            titles
-        })
-    }
-
     const setPageComponents = (pageComponents) => {
-        dispatch({
-            ...state,
-            pageComponents
-        })
+        if (dispatch) {
+            state.pageComponents = [...pageComponents];
+            dispatch({
+                ...state/*,
+                pageComponents: [...pageComponents]*/
+            })
+        }
     }
 
     return {
         components: state.components,
         pageComponents: state.pageComponents,
-    
+
+        /**
+         * @param {{builderComponent: (function()), data: {}, title: string, category: string, imagePreview: (function()), recursive: boolean, uiComponent: (function())}} component
+         */
         register(component) {
-            if (state.components.titles.indexOf(component.title) === -1) {
+            if (state.components.map(c => c.title).indexOf(component.title) === -1) {
                 const slug = component.title.replace(/\ /g, '-').toLowerCase();
-    
-                setComponents({
-                    titles: [...state.titles, component.title],
-                    components: [...state.components, { ...component, slug, data: { ...(component.data ?? {}) } }]
-                });
+
+                setComponents([
+                    ...state.components,
+                    { ...component, slug, data: { ...(component.data ?? {}) } }
+                ]);
             }
         },
-    
+
         setData(index, data) {
             setPageComponents(state.pageComponents.map((c, i) => {
                 if (i === index) {
@@ -62,14 +66,16 @@ export const useComponents = () => {
                 return c;
             }));
         },
-    
+
         registerInPage(title, defaultData = {}) {
+            const index = state.components.reduce((r, c) => c.title, []).indexOf(title);
+
             setPageComponents([
                 ...state.pageComponents,
-                { ...state.components[state.titles.indexOf(title)], data: { ...(state.components[state.titles.indexOf(title)].data ?? defaultData) } }
+                { ...state.components[index], data: { ...(state.components[index].data ?? defaultData) } }
             ]);
         },
-        
+
         unregisterFromPage(index) {
             setPageComponents(state.pageComponents.reduce((r, c, i) => i === index ? r : [...r, c], []));
         }

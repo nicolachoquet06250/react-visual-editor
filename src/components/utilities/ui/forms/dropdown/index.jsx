@@ -1,7 +1,9 @@
-import { useEffect } from 'react';
+import { createContext, useContext, useEffect, useReducer, useState } from 'react';
 import { createUseStyles } from 'react-jss';
-import { useToggle } from 'react-use';
+import { useFirstMountState, useToggle } from 'react-use';
 import {Button} from '../buttons';
+import { VisualEditorState, visualEditorState, VisualEditorStateDispatcher } from "../../../../../context";
+import { FaIcon } from "../../../../../enums/icons";
 
 const useStyles = createUseStyles({
     dropdown: {
@@ -39,6 +41,14 @@ const useStyles = createUseStyles({
         }
     },
 
+    optionContainer: {
+        position: 'absolute',
+        transform: 'translate3d(0px, 30px, 0px)',
+        top: 0,
+        left: 0,
+        willChange: 'transform'
+    },
+
     option: {
         display: 'block',
         width: '100%',
@@ -60,45 +70,74 @@ const useStyles = createUseStyles({
     }
 });
 
-export const Dropdown = ({label, value, selected, onUpdate, onChange, children}) => {
-    const {dropdown} = useStyles();
-    const [opened, toggleOpened] = useToggle(false);
+export const useContextDropdown = () => {
+    const [dropdownValue, setDropdownValue] = useState('');
+    const [dropdownLabel, setDropdownLabel] = useState('');
 
-    return (
-        <div className={dropdown}>
-            <Button className={'dropdown-toggle'}
-                    type={'button'}
-                    data-toggle={'dropdown'}
-                    aria-haspopup={'true'}
-                    aria-expanded={'false'}
-                    onClick={toggleOpened}>
-                {label ?? value}
+    return {
+        Dropdown({label, value, onChange, children}) {
+            const {dropdown, optionContainer} = useStyles();
 
-                <i className={'fa-solid fa-caret-down'}></i>
-            </Button>
+            useEffect(() => {
+                (dropdownValue === '') && (() => {
+                    setDropdownValue(value);
+                    setDropdownLabel(label);
+                })()
+            }, [])
 
-            <div className={`dropdown-menu ${opened ? 'show' : ''}`} aria-labeledby='dropdownMenuButton'
-                 style="position: absolute; transform: translate3d(0px, 30px, 0px); top: 0; left: 0; will-change: transform;">
-                {children}
-            </div>
-        </div>
-    );
-};
+            const [opened, setOpened] = useState(false);
+            const firstLoaded = useFirstMountState();
 
-export const Option = ({children, target, onReady, onClick}) => {
-    const {option} = useStyles();
+            useEffect(() => {
+                !firstLoaded && setOpened(!opened);
+                dropdownValue && onChange({
+                    value: dropdownValue,
+                    label: dropdownLabel
+                });
+            }, [dropdownValue])
 
-    useEffect(() => {
-        onReady(target);
-    });
+            return (
+                <div className={dropdown}>
+                    <Button className={'dropdown-toggle'}
+                            type={'button'}
+                            data-toggle={'dropdown'}
+                            aria-haspopup={'true'}
+                            aria-expanded={'false'}
+                            onClick={() => {
+                                setOpened(!opened)
+                                console.log(opened)
+                            }}>
+                        {dropdownLabel}
 
-    const handleClick = () => {
-        onClick(target);
+                        <i className={FaIcon.DROPDOWN_ARROW} />
+                    </Button>
+
+                    <div className={optionContainer + ` dropdown-menu ${opened ? 'show' : ''}`}
+                         aria-labelledby={'dropdownMenuButton'}>
+                        {children}
+                    </div>
+                </div>
+            );
+        },
+
+        Option({children, target}) {
+            const {option} = useStyles();
+
+            const handleClick = e => {
+                e.preventDefault();
+
+                setDropdownValue(target);
+                setDropdownLabel(children);
+            }
+
+            return (
+                <a href="#"
+                   data-target={target}
+                   onClick={handleClick}
+                   className={option}>
+                    {children}
+                </a>
+            );
+        }
     }
-
-    return (
-        <a href="#" data-target={target} onClick={e => {e.preventDefault(); handleClick()}} className={option}>
-            {children}
-        </a>
-    );
 };

@@ -1,7 +1,6 @@
 import {createContext} from 'react';
 
 export const visualEditorState = {
-    titles: [],
     components: [],
     pageComponents: [],
     modals: {}

@@ -57,20 +57,14 @@ export const Repeater = ({title, addLabel, value, onUpdate, onChange, voidModel,
     const [values, setValues] = useState((value ?? []));
 
     const handleAdd = () => {
-        if (typeof voidModel === "object") {
-            setValues([
-                ...values,
-                (voidModel instanceof Array ? [...voidModel] : {...voidModel})
-            ]);
-        } else {
-            setValues([
-                ...values,
-                voidModel
-            ]);
-        }
-        
-        onUpdate(values);
-        onChange(values);
+        onUpdate([
+            ...values,
+            voidModel
+        ]);
+        onChange([
+            ...values,
+            voidModel
+        ]);
     };
 
     useEffect(() => {
@@ -87,12 +81,12 @@ export const Repeater = ({title, addLabel, value, onUpdate, onChange, voidModel,
                     </h5>
                 </Col>
             </Row>
-            
+
             {values.map((_, i) => {
                 const Child = child;
-                return <Child i={i} onChange={onChange(values)} />
+                return <Child i={i} onChange={() => onChange(values)} key={'repeater-index-' + i} onDelete={() => onChange(values.reduce((r, c, index) => i === index ? r : [...r, c], []))} />
             })}
-            
+
             <Row>
                 <Col style={'display: flex; justify-content: flex-end'}>
                     <Button onClick={handleAdd}>
@@ -113,13 +107,7 @@ export const SimpleBox = ({children, pl, pr, pb, pt, px, py, p0 = false}) => {
     const {simplebox} = useStyles({pl: _pl, pr: _pr, pb: _pb, pt: _pt})
 
     return (
-        <div className={{
-            pl: !p0 && (!!pl || !!px),
-            pr: !p0 && (!!pr || !!px),
-            pb: !p0 && (!!pb || !!py),
-            pt: !p0 && (!!pt || !!py),
-            p0
-        }} className={simplebox}>
+        <div className={simplebox + ` ${!p0 && (!!pl || !!px) ? 'pl' : ''} ${!p0 && (!!pr || !!px) ? 'pr' : ''} ${!p0 && (!!pb || !!py) ? 'pb' : ''} ${!p0 && (!!pt || !!py) ? 'pt' : ''}`}>
             {children}
         </div>
     );

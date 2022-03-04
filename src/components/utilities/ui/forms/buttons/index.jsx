@@ -53,10 +53,10 @@ export const Button = ({icon, circle, close, activeColor, noBorder, active, onCl
 
     return (
         <button className={button + ` ${circle ?  'circle' : ''} ${noBorder ? 'no-border' : ''} ${active ? 'active' : ''} ${className ?? ''}`}
-                onClick={onClick} 
-                onMouseOver={onMouseOver} 
+                onClick={onClick}
+                onMouseOver={onMouseOver}
                 onMouseOut={onMouseOut}>
-            {_icon && <i className={_icon}></i>}
+            {_icon && <i className={_icon} />}
 
             {children}
         </button>

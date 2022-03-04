@@ -1,4 +1,3 @@
-import { useEffect } from "react";
 import { createUseStyles } from "react-jss";
 
 const useStyles = createUseStyles({
@@ -17,7 +16,7 @@ const useStyles = createUseStyles({
         },
 
         '&::after': {
-            content: '',
+            content: "''",
             display: 'block',
             width: '12px',
             height: '12px',
@@ -26,31 +25,41 @@ const useStyles = createUseStyles({
             transition: 'transform .2s ease-out',
             backgroundColor: 'black',
             border: '1px solid white'
+        },
+
+        '&.checked::after': {
+            transform: 'translateX(15px)'
+        },
+
+        '&::before': {
+            content: "''",
+            display: 'block',
+            backgroundColor: 'black',
+            width: '100%',
+            height: '100%',
+            position: 'absolute',
+            transform: 'translateX(-100%)',
+            transition: 'transform .1s ease-out'
+        },
+
+        '&.checked::before': {
+            transform: 'translateX(0)'
         }
     }
 });
 
-export const Switch = ({value, onUpdate, onChange, children}) => {
+export const Switch = ({value, onChange, children}) => {
     const {switch: switchStyle} = useStyles();
 
-    const handleChange = () => {
-        onUpdate(!value);
-    };
-
-    useEffect(() => {
-        onChange(value);
-    }, [value])
-
     return (<>
-        <label className={{
-            checked: value,
-            switch: true
-        }} className={switchStyle}>
-            <input type='checkbox' value={value} onChange={handleChange} />
+        <label className={switchStyle + ` ${value ? 'checked' : ''} switch`}>
+            <input type='checkbox' checked={value} onChange={onChange} />
+        </label>
 
-            <label onClick={toggleChecked}>
+        {children && (
+            <label onClick={onChange}>
                 {children}
             </label>
-        </label>
+        )}
     </>);
 };

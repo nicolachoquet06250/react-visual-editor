@@ -3,6 +3,7 @@ import {useState, useReducer} from 'react';
 import {VisualEditorSidebar} from './sidebar';
 import {VisualEditorContent} from './content';
 import {visualEditorState, VisualEditorState, VisualEditorStateDispatcher} from '../../context';
+import { AddComponentModal } from "../modals/add-component";
 
 const useStyles = createUseStyles({
     visualEditor: {
@@ -25,32 +26,43 @@ const useStyles = createUseStyles({
         alignItems: 'center',
         borderRight: '1px solid gray',
         position: 'relative',
-        transition: 'width .3s ease-out',
+        transition: 'transform .3s ease-out',
+        zIndex: 2,
         '&.closed': {
-            transition: 'width .3s ease-out',
-            minWidth: 0,
-            width: 0,
-            transform: 'translateX(-10px)'
+            transform: 'translateX(-100%)',
+
+            '& + section': {
+                width: '100%!important',
+                height: '100vh',
+                transform: `translateX(-${props?.minSidebarWidth ?? '0px'})`
+            }
         }
     }),
 
     content: (props) => ({
         overflowY: 'auto',
         height: '100%',
-        width: `calc(100% - ${props.cssResizerWidth ?? props.minSidebarWidth} - 1px)`
+        width: `calc(100% - ${props.cssResizerWidth ?? props.minSidebarWidth} - 1px)`,
+        transform: 'translateX(0px)',
+        transition: 'transform .3s ease-out',
     })
 });
 
-export const VisualEditor = ({ layout, onSend }) => {
+export const VisualEditor = ({ layout, registerer, onSend }) => {
+    const Registerer = registerer;
+
     const [closed, setClosed] = useState(false);
 
     const {visualEditor, sidebar, content} = useStyles({
-        minSidebarWidth: closed ? '0px' : '300px',
-        cssResizerWidth: closed ? '0px' : '300px'
+        minSidebarWidth: '300px', cssResizerWidth: '300px'
     });
 
-    const onOpen = () => {};
-    const onClose = () => {};
+    const onOpen = () => {
+        setClosed(false);
+    };
+    const onClose = () => {
+        setClosed(true)
+    };
 
     const [state, dispatch] = useReducer(
         (state, newValue) => ({ ...state, ...newValue }),
@@ -60,8 +72,10 @@ export const VisualEditor = ({ layout, onSend }) => {
     return (
         <VisualEditorState.Provider value={state}>
             <VisualEditorStateDispatcher.Provider value={dispatch}>
+                <Registerer />
+
                 <main className={visualEditor}>
-                    <aside className={sidebar}>
+                    <aside className={sidebar + ' ' + (closed ? 'closed' : '')}>
                         <VisualEditorSidebar onOpen={onOpen} onClose={onClose} onSend={onSend} />
                     </aside>
 
@@ -69,6 +83,8 @@ export const VisualEditor = ({ layout, onSend }) => {
                         <VisualEditorContent layout={layout} />
                     </section>
                 </main>
+
+                <AddComponentModal />
             </VisualEditorStateDispatcher.Provider>
         </VisualEditorState.Provider>
     );

@@ -1,4 +1,5 @@
 import {createUseStyles} from "react-jss";
+import { useComponents } from "../../../hooks";
 
 const useStyles = createUseStyles({
     main: {
@@ -11,18 +12,27 @@ export const VisualEditorContent = ({ layout }) => {
 
     const { main } = useStyles();
 
-    const LayoutComponent = () => (
+    const { pageComponents: components } = useComponents();
+
+    const WithLayoutComponent = ({children}) => (
         <Layout>
-            coucou
+            {children}
         </Layout>
     );
-    const NotLayoutComponent = () => (
+    const WithoutLayoutComponent = ({children}) => (
         <main className={main}>
-            coucou
+            {children}
         </main>
     );
 
-    const Component = layout ? LayoutComponent : NotLayoutComponent;
+    const LayoutComponent = layout ? WithLayoutComponent : WithoutLayoutComponent;
 
-    return (<Component />);
+    return (<LayoutComponent>
+        {components.map(c => ({
+            Component: c.uiComponent,
+            data: c.data
+        })).map(({Component, data}, i) => (
+            <Component {...data} key={'custom-component-' + i} />
+        ))}
+    </LayoutComponent>);
 };

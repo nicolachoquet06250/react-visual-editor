@@ -41,7 +41,7 @@ export const Container = ({children}) => {
     );
 };
 
-export const Row = () => {
+export const Row = ({children}) => {
     const {row} = useStyles();
 
     return (
@@ -51,7 +51,7 @@ export const Row = () => {
     );
 };
 
-export const Column = () => {
+export const Column = ({children}) => {
     const {column} = useStyles();
 
     return (
@@ -61,7 +61,7 @@ export const Column = () => {
     );
 };
 
-export const Col = () => {
+export const Col = ({children}) => {
     const {col} = useStyles();
 
     return (

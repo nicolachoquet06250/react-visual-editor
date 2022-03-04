@@ -2,9 +2,12 @@ import './index.css';
 import {createUseStyles} from 'react-jss';
 import {Button} from '../../utilities/ui/forms';
 import {FaIcon} from '../../../enums/icons';
-import {Modals} from '../../../enums';
-import {useComponents, useModal} from '../../../hooks';
+import { useComponents, useModal } from '../../../hooks';
 import {useToggle} from 'react-use';
+import { AddComponentModalButton } from "../../modals/add-component";
+import { FlexBox, SimpleBox } from "../../utilities/ui/boxes";
+import { Col, Container, Row } from "../../utilities/grid";
+import { Modals } from "../../../enums";
 
 const useStyles = createUseStyles({
     header: {
@@ -110,12 +113,11 @@ const useStyles = createUseStyles({
 
 export const VisualEditorSidebar = ({onClose, onOpen, onSend}) => {
     const {pageComponents: components, setData, unregisterFromPage: unregisterComponent} = useComponents();
-    //const {open: openAddComponentModal} = useModal(Modals.AddComponent);
-    //const {open: openValidateDataModal} = useModal(Modals.ValidateData);
 
     const {header, main, footer, openCloseButton, componentBuilderCard} = useStyles();
 
     const [isOpened, toggleOpened] = useToggle(true);
+    const {open} = useModal(Modals.ValidateData);
 
     const handleToggleSidebar = () => {
         isOpened ? onClose() : onOpen();
@@ -123,24 +125,23 @@ export const VisualEditorSidebar = ({onClose, onOpen, onSend}) => {
     };
 
     const handleSend = () => {
-        onSend({
+        onSend && onSend({
             data: components.reduce((r, c) => [ ...r, { _name: c.slug, ...(c.data ?? {}) } ], [])
         });
-        //openValidateDataModal();
+
+        open();
     };
 
-    const sendComponentData = (title, i, e) => {
-        // console.log(title, i, e.data);
+    const sendComponentData = (i, e) => {
         setData(i, e.data);
     };
 
     const handleDeleteComponent = index => {
-        // console.log(title, index);
         unregisterComponent(index);
     };
 
     const handleExport = () => {
-        const data = components.value.reduce((r, c) => [ ...r, { _name: c.slug, ...(c.data ?? {}) } ], []);
+        const data = components.reduce((r, c) => [ ...r, { _name: c.slug, ...(c.data ?? {}) } ], []);
         const _data = JSON.stringify(data)
         const blob = new Blob([_data], {type: 'text/plain'})
         const a = document.createElement('a');
@@ -155,42 +156,70 @@ export const VisualEditorSidebar = ({onClose, onOpen, onSend}) => {
     const toggleOpenCard = e => {
         const section = getParent('section', e.target);
         section?.classList[(section?.classList.contains('opened') ? 'remove' : 'add')]('opened');
-        console.log(e.target, section);
     };
 
     return (
         <>
             <header className={header}>
                 <div>
-                    <Button circle={true} icon={FaIcon.PLUS} />
+                    <AddComponentModalButton circle={true} icon={FaIcon.PLUS} />
                 </div>
 
-                <Button className={openCloseButton + ` ${isOpened ? 'open' : 'close'}`} 
-                        circle={true} 
+                <Button className={openCloseButton + ` ${isOpened ? 'open' : 'close'}`}
+                        circle={true}
                         icon={isOpened ? FaIcon.LOCK : FaIcon.LOCK_OPEN}
                         onClick={handleToggleSidebar} />
             </header>
 
             <main className={main}>
-                components
                 {components.map((builderComponent, i) => {
                     return (
-                        <section className={componentBuilderCard} 
-                                 style={i > 0 ? 'margin-right: 5px;' : ''}>
+                        <section className={componentBuilderCard} key={'sidebar-section-' + i}>
                             <header onClick={toggleOpenCard}>
-                                
+                                <SimpleBox px={5}>
+                                    <Container>
+                                        <Row>
+                                            <Col>
+                                                <FlexBox alignItems={'center'}>
+                                                    <h5>{builderComponent.title}</h5>
+                                                </FlexBox>
+                                            </Col>
+
+                                            <Col>
+                                                <FlexBox alignItems={'center'}
+                                                         justifyContent={'flex-end'}>
+                                                    <Button circle={true}
+                                                            icon={FaIcon.TRASH}
+                                                            noBorder={true}
+                                                            activeColor={'red'}
+                                                            onClick={() => handleDeleteComponent(i)} />
+                                                </FlexBox>
+                                            </Col>
+                                        </Row>
+                                    </Container>
+                                </SimpleBox>
                             </header>
+
+                            <main>
+                                <SimpleBox px={5} py={5}>
+                                    {(() => {
+                                        const Component = builderComponent.builderComponent;
+
+                                        return (<Component {...builderComponent.data} onSend={e => sendComponentData(i, e)} />);
+                                    })()}
+                                </SimpleBox>
+                            </main>
                         </section>
                     )
                 })}
             </main>
 
             <footer className={footer}>
-                <Button circle={false} 
+                <Button circle={false}
                         icon={FaIcon.EXPORT}
                         onClick={handleExport}> Export</Button>
 
-                <Button circle={true} 
+                <Button circle={true}
                         icon={FaIcon.SEND}
                         onClick={handleSend} />
             </footer>
