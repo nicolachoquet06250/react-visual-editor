@@ -31,8 +31,7 @@ export const useComponents = () => {
         if (dispatch) {
             state.pageComponents = [...pageComponents];
             dispatch({
-                ...state/*,
-                pageComponents: [...pageComponents]*/
+                ...state
             })
         }
     }
@@ -72,7 +71,7 @@ export const useComponents = () => {
 
             setPageComponents([
                 ...state.pageComponents,
-                { ...state.components[index], data: { ...(state.components[index].data ?? defaultData) } }
+                { ...state.components[index], data: { ...(state.components[index].data ?? defaultData) }, opened: true }
             ]);
         },
 

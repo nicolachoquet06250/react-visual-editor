@@ -1,5 +1,6 @@
 import {createUseStyles} from "react-jss";
 import { useComponents } from "../../../hooks";
+import { JsonDebugger } from "../../utilities/debug";
 
 const useStyles = createUseStyles({
     main: {
@@ -28,6 +29,8 @@ export const VisualEditorContent = ({ layout }) => {
     const LayoutComponent = layout ? WithLayoutComponent : WithoutLayoutComponent;
 
     return (<LayoutComponent>
+        {/*<JsonDebugger json={components.map(c => c.data)} />*/}
+
         {components.map(c => ({
             Component: c.uiComponent,
             data: c.data

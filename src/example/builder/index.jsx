@@ -1,12 +1,12 @@
-import { Repeater, SimpleBox } from "../../components/utilities/ui/boxes";
+import { Repeater } from "../../components/utilities/ui/boxes";
 import { Col, Container, Row, DropdownButton, Dropdown, ButtonGroup, Button, Nav, Form } from "react-bootstrap";
 import wording from './wording';
-import { Text } from "../../components/utilities/ui/forms";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { FaIcon } from "../../enums/icons";
 import { ComponentList } from '../../components/utilities/ui/lists/builder';
+import { useEventHandler, useSimpleHandler } from "../../hooks/handlers";
 
-export const MyComponent = ({text, select, texts, selected, component}) => {
+export const MyComponent = ({text, select, texts, selected, component, onSend}) => {
 	const [_text, setText] = useState(text ?? '');
 	const [_select, setSelect] = useState(select ?? 'toto');
 	const [_selectLabel, setSelectLabel] = useState(select ?? 'Toto');
@@ -16,149 +16,169 @@ export const MyComponent = ({text, select, texts, selected, component}) => {
 
 	const [currentTab, setCurrentTab] = useState('coucou');
 
-	const sendData = () => {}
+	const deleteText = useSimpleHandler(index =>
+		setTexts(_texts.reduce((r, c, i) => index === i ? r : [...r, c], [])));
 
-	const deleteText = index => {
-		console.log(_texts.reduce((r, c, i) => index === i ? r : [...r, c], []))
-		setTexts(_texts.reduce((r, c, i) => index === i ? r : [...r, c], []));
-	};
+	const updateText = useEventHandler((e, i) =>
+		setTexts(_texts.map((c, index) => i === index ? e.target.value : c)))
 
-	const updateText = i => e => {
-		setTexts(_texts.map((c, index) => i === index ? e.target.value : c))
-	};
-
-	const changeTexts = e => {
-		setTexts(e);
-		sendData();
-	};
+	useEffect(() => {
+		onSend({
+			data: {
+				text: _text,
+				select: _select,
+				texts: _texts,
+				selected: _selected,
+				component: _component
+			}
+		})
+	}, [_text, _select, _texts, _selected, _component])
 
 	const DeleteButton = ({i}) => (
 		<Button variant={'outline-danger'}
-		        onClick={() => deleteText(i)}>
+		        onClick={deleteText(i)}>
 			<i className={FaIcon.TRASH} />
 		</Button>
 	);
 
 	return (
 		<div>
-			<SimpleBox p0={true}>
-				<Container>
-					<Row>
-						<Col>
-							<h6>{wording.input.title}</h6>
-							<Text value={_text}
-							      placeholder={wording.input.placeholder}
-							      onUpdate={setText} onInput={sendData}/>
-						</Col>
+			<Container fluid={'sm'}>
+				<Row>
+					<Col>
+						<Form>
+							<Form.Group className="mb-3" controlId="exampleForm.ControlInput1">
+								<Form.Label>
+									{wording.input.title}
+								</Form.Label>
 
-						<Col>
-							<h6>{wording.test_text.title}</h6>
-							<span>{wording.test_text.text}</span>
-						</Col>
-					</Row>
+								<Form.Control type="text"
+								              placeholder={wording.input.placeholder}
+								              value={_text}
+								              onChange={e => setText(e.target.value)} />
+							</Form.Group>
+						</Form>
+					</Col>
 
-					<Row>
-						<Col>
-							<DropdownButton as={ButtonGroup} id={`dropdown-secondary`}
-											variant={'outline-secondary'} title={_selectLabel}>
-								<Dropdown.Item eventKey="toto" onClick={() => {setSelect('toto'); setSelectLabel('Toto')}}>
-									Toto
-								</Dropdown.Item>
-								<Dropdown.Item eventKey="titi" onClick={() => {setSelect('titi'); setSelectLabel('Titi')}}>
-									Titi
-								</Dropdown.Item>
-								<Dropdown.Item eventKey="tata" onClick={() => {setSelect('tata'); setSelectLabel('Tata')}}>
-									Tata
-								</Dropdown.Item>
-							</DropdownButton>
-						</Col>
-					</Row>
-				</Container>
+					<Col>
+						<h6>{wording.test_text.title}</h6>
+						<span>{wording.test_text.text}</span>
+					</Col>
+				</Row>
 
-				<Repeater title={'Repeater component title'} addLabel={'Add text'}
-				          value={_texts} voidModel={''}
-				          onChange={changeTexts}>
-					{_texts.map((_, i) => (<Row style={{ marginBottom: '5px' }} key={'repeater-row-' + i}>
-						<Col>
-							<Text value={_texts[i]} 
-								  onInput={updateText(i)} 
-								  placeholder={wording.repeater.input.placeholder} />
-						</Col>
+				<Row>
+					<Col>
+						<DropdownButton as={ButtonGroup} id={`dropdown-secondary`}
+										variant={'outline-secondary'} title={_selectLabel}>
+							<Dropdown.Item eventKey="toto"
+							               onClick={() => {
+											   setSelect('toto');
+											   setSelectLabel('Toto');
+										   }}>
+								Toto
+							</Dropdown.Item>
+							<Dropdown.Item eventKey="titi"
+							               onClick={() => {
+											   setSelect('titi');
+											   setSelectLabel('Titi');
+										   }}>
+								Titi
+							</Dropdown.Item>
+							<Dropdown.Item eventKey="tata"
+							               onClick={() => {
+											   setSelect('tata');
+											   setSelectLabel('Tata');
+										   }}>
+								Tata
+							</Dropdown.Item>
+						</DropdownButton>
+					</Col>
+				</Row>
+			</Container>
 
-						<Col sm={3} style={{ textAlign: 'right' }}>
-							<DeleteButton i={i} />
-						</Col>
-					</Row>))}
-				</Repeater>
+			<Repeater title={'Repeater component title'} addLabel={'Add text'}
+			          value={_texts} voidModel={''}
+			          onChange={setTexts}>
+				{_texts.map((_, i) => (<Row style={{ marginBottom: '5px' }} key={'repeater-row-' + i}>
+					<Col>
+						<Form.Group className="mb-3" controlId="exampleForm.ControlInput1">
+							<Form.Control type="text"
+							              placeholder={wording.repeater.input.placeholder}
+							              value={_texts[i]}
+							              onChange={updateText(i)} />
+						</Form.Group>
+					</Col>
 
-				<Container>
-					<Row>
-						<Col>
-							<hr />
-						</Col>
-					</Row>
-				</Container>
+					<Col sm={3} style={{ textAlign: 'right' }}>
+						<DeleteButton i={i} />
+					</Col>
+				</Row>))}
+			</Repeater>
 
-				<SimpleBox py={5}>
+			<Container fluid={'sm'}>
+				<Row>
+					<Col>
+						<hr />
+					</Col>
+				</Row>
+			</Container>
+
+			<Container fluid={'sm'}>
+				<Row>
+					<Col>
+						<Nav justify variant="tabs" defaultActiveKey={"coucou"}>
+							<Nav.Item>
+								<Nav.Link href={'coucou'}
+										  onClick={e => {
+											  e.preventDefault();
+											  setCurrentTab('coucou')
+										  }}>
+									Coucou
+								</Nav.Link>
+							</Nav.Item>
+
+							<Nav.Item>
+								<Nav.Link href={'coucou2'}
+										  onClick={e => {
+											  e.preventDefault();
+											  setCurrentTab('coucou2')
+										  }}>
+									Coucou 2
+								</Nav.Link>
+							</Nav.Item>
+						</Nav>
+					</Col>
+				</Row>
+
+				{currentTab === 'coucou' && (<Row>
 					<Container>
-						<Row>
-							<Col>
-								<Nav justify variant="tabs" defaultActiveKey={"coucou"}>
-									<Nav.Item>
-										<Nav.Link href={'coucou'} 
-												  onClick={e => {
-													  e.preventDefault(); 
-													  setCurrentTab('coucou')
-												  }}>
-											Coucou
-										</Nav.Link>
-									</Nav.Item>
+						Coucou
 
-									<Nav.Item>
-										<Nav.Link href={'coucou2'} 
-												  onClick={e => {
-													  e.preventDefault(); 
-													  setCurrentTab('coucou2')
-												  }}>
-											Coucou 2
-										</Nav.Link>
-									</Nav.Item>
-								</Nav>
-							</Col>
-						</Row>
-
-						{currentTab === 'coucou' && (<Row>
-							<Container>
-								Coucou
-
-								<Form>
-									<Form.Check 
-										defaultChecked={_selected}
-										onChange={() => setSelected(!_selected)}
-										type="switch"
-										id="custom-switch"
-										label="Un switch" />
-								</Form>
-							</Container>
-						</Row>)}
-
-						{currentTab === 'coucou2' && (<Row>
-							<Container>
-								Coucou 2
-							</Container>
-						</Row>)}
+						<Form>
+							<Form.Check
+								defaultChecked={_selected}
+								onChange={() => setSelected(!_selected)}
+								type="switch"
+								id="custom-switch"
+								label="Un switch" />
+						</Form>
 					</Container>
-				</SimpleBox>
+				</Row>)}
 
-				{/*<ComponentList defaultComponent={_component} onSend={e => {
-					setComponent(e);
-					sendData();
-				}} />*/}
-			</SimpleBox>
+				{currentTab === 'coucou2' && (<Row>
+					<Container>
+						Coucou 2
+					</Container>
+				</Row>)}
+			</Container>
+
+			<ComponentList defaultComponent={_component} onSend={setComponent} />
 		</div>
 	);
 }
 
 export const MySecondComponent = () => {
-	return (<></>);
+	return (<h5>
+		Mon decond composant
+	</h5>);
 }

@@ -1,13 +1,12 @@
 import { Modal } from "../../utilities/ui/modals";
-import { Button, Nav } from "react-bootstrap";
+import { Button, Nav, Col, Container, Row } from "react-bootstrap";
 import { useComponents, useModal } from "../../../hooks";
 import { Modals } from "../../../enums";
-import { useContextTabs } from "../../utilities/ui/tabs";
 import { FaIcon } from "../../../enums/icons";
-import { Col, Container, Row } from "../../utilities/grid";
-import { Fragment, useEffect, useState } from "react";
+import { Fragment, useState } from "react";
 import { FlexBox } from "../../utilities/ui/boxes";
 import { createUseStyles } from "react-jss";
+import { useSimpleHandler } from "../../../hooks/handlers";
 
 const useStyles = createUseStyles({
     modal: {
@@ -26,8 +25,7 @@ const AddComponentModalHeader = () => (<h2>Ajouter un composant</h2>);
 
 export const AddComponentModal = () => {
     const {modal} = useStyles();
-    const {Tabs, Tab, Content} = useContextTabs();
-    const {components, pageComponents, registerInPage} = useComponents();
+    const {components, registerInPage} = useComponents();
     const [currentTab, setCurrentTab] = useState('all');
     const {close} = useModal(Modals.AddComponent);
 
@@ -70,10 +68,31 @@ export const AddComponentModal = () => {
         return tmp;
     })()];
 
-    const createComponent = title => {
+    const createComponent = useSimpleHandler(title => {
         registerInPage(title);
 
         close()
+    });
+
+    const handleMouseOver = e => {
+        e.preventDefault();
+        e.stopPropagation();
+
+        if (e.target.tagName !== 'IMG') {
+            e.target.querySelector('img') && (e.target.querySelector('img').style.height = '55px')
+        } else {
+            e.target && (e.target.style.height = '55px')
+        }
+    };
+
+    const handleMouseOut = e => {
+        e.preventDefault();
+        e.stopPropagation();
+        if (e.target.tagName !== 'IMG') {
+            e.target.querySelector('img') && (e.target.querySelector('img').style.height = '50px')
+        } else {
+            e.target && (e.target.style.height = '50px')
+        }
     }
 
     return (
@@ -84,10 +103,10 @@ export const AddComponentModal = () => {
             <Nav justify variant="tabs" defaultActiveKey="all">
                 {categoryList.map((cat, i) => (
                     <Nav.Item key={'nav-item-' + i}>
-                        <Nav.Link href={cat.slug} 
-                                  key={'tab-' + i} 
+                        <Nav.Link href={cat.slug}
+                                  key={'tab-' + i}
                                   onClick={e => {
-                                      e.preventDefault(); 
+                                      e.preventDefault();
                                       setCurrentTab(cat.slug)
                                   }}>
                             {cat.slug === 'all' ? (<i className={FaIcon.GLOBE} />) : cat.name}
@@ -95,49 +114,30 @@ export const AddComponentModal = () => {
                     </Nav.Item>
                 ))}
             </Nav>
-            
-            <Container>
+
+            <Container style={{ paddingTop: '15px', paddingBottom: '15px', border: '1px solid var(--bs-gray-300)', borderBottomLeftRadius: '5px', borderBottomRightRadius: '5px' }}>
                 {componentList.map((row, j) => (
                     <Row key={'row-' + j}>
                         {row.map((component, i) => (
                             <Fragment key={'frag-' + i}>
-                                {row.length === 1 && (<Col key={'col-' + i}>
+                                <Col key={'col-' + i}>
                                     <Button variant={'outline-secondary'}
-                                            onMouseOver={e => e.target.querySelector('img') && (e.target.querySelector('img').style.height = '55px')}
-                                            onMouseOut={e => e.target.querySelector('img') && (e.target.querySelector('img').style.height = '50px')}
-                                            onClick={() => createComponent(component.title)}>
+                                            onMouseOver={handleMouseOver}
+                                            onMouseOut={handleMouseOut}
+                                            onClick={createComponent(component.title)}>
                                         <FlexBox direction={'column'}
                                                  justifyContent={'space-between'}
                                                  alignItems={'center'}>
                                             <img src={component.imagePreview}
                                                  alt={`component "${component.title}" preview`}
                                                  style={{height: '50px', transition: 'height .2s ease-out'}}
-                                                 onMouseOver={e => e.target && (e.target.style.height = '55px')}
-                                                 onMouseOut={e => e.target && (e.target.style.height = '55px')} />
+                                                 onMouseOver={handleMouseOver}
+                                                 onMouseOut={handleMouseOut} />
 
                                             {component.title}
                                         </FlexBox>
                                     </Button>
-                                </Col>)}
-
-                                {row.length > 1 && (<Col>
-                                    <Button variant={'outline-secondary'}
-                                            onMouseOver={e => e.target.querySelector('img') && (e.target.querySelector('img').style.height = '55px')}
-                                            onMouseOut={e => e.target.querySelector('img') && (e.target.querySelector('img').style.height = '50px')}
-                                            onClick={() => createComponent(component.title)}>
-                                        <FlexBox direction={'column'}
-                                                 justifyContent={'space-between'}
-                                                 alignItems={'center'}>
-                                            <img src={component.imagePreview}
-                                                 alt={`component "${component.title}" preview`}
-                                                 style={{height: '50px', transition: 'height .2s ease-out'}}
-                                                 onMouseOver={e => e.target && (e.target.style.height = '55px')}
-                                                 onMouseOut={e => e.target && (e.target.style.height = '55px')} />
-
-                                            {component.title}
-                                        </FlexBox>
-                                    </Button>
-                                </Col>)}
+                                </Col>
                             </Fragment>
                         ))}
                     </Row>
@@ -156,8 +156,8 @@ export const AddComponentModalButton = () => {
     const {open} = useModal(Modals.AddComponent);
 
     return (
-        <Button variant={'outline-dark'} 
-                size={'sm'} 
+        <Button variant={'outline-dark'}
+                size={'sm'}
                 onClick={open}>
             <i className={FaIcon.PLUS} />
         </Button>

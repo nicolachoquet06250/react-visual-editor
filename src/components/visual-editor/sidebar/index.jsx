@@ -2,10 +2,11 @@ import './index.css';
 import {createUseStyles} from 'react-jss';
 import {FaIcon} from '../../../enums/icons';
 import { useComponents, useModal } from '../../../hooks';
-import {useToggle} from 'react-use';
+import { useToggle } from 'react-use';
 import { AddComponentModalButton } from "../../modals/add-component";
 import { Modals } from "../../../enums";
 import { Card, Col, Container, Row, Button } from 'react-bootstrap';
+import { useEventHandler, useSimpleHandler } from "../../../hooks/handlers";
 
 const useStyles = createUseStyles({
     header: {
@@ -78,7 +79,9 @@ export const VisualEditorSidebar = ({onClose, onOpen, onSend}) => {
     const [isOpened, toggleOpened] = useToggle(true);
     const {open} = useModal(Modals.ValidateData);
 
-    const handleToggleSidebar = () => {
+    const handleToggleSidebar = e => {
+        e.stopPropagation();
+
         isOpened ? onClose() : onOpen();
         toggleOpened();
     };
@@ -91,13 +94,9 @@ export const VisualEditorSidebar = ({onClose, onOpen, onSend}) => {
         open();
     };
 
-    const sendComponentData = (i, e) => {
-        setData(i, e.data);
-    };
+    const sendComponentData = useEventHandler((e, i) => setData(i, e.data));
 
-    const handleDeleteComponent = index => {
-        unregisterComponent(index);
-    };
+    const handleDeleteComponent = useSimpleHandler(unregisterComponent);
 
     const handleExport = () => {
         const data = components.reduce((r, c) => [ ...r, { _name: c.slug, ...(c.data ?? {}) } ], []);
@@ -110,12 +109,17 @@ export const VisualEditorSidebar = ({onClose, onOpen, onSend}) => {
         a.dispatchEvent(new MouseEvent('click', { cancelable: false }));
     };
 
-    const getParent = (tag, root) => root?.parentElement?.tagName.toLowerCase() === tag ? root?.parentElement : getParent(tag, root?.parentElement);
+    const getParentWithClass = (className, root) => {
+        return root?.parentElement?.classList?.contains(className) ?
+            root?.parentElement : getParentWithClass(className, root?.parentElement);
+    }
 
-    const toggleOpenCard = e => {
-        const section = getParent('section', e.target);
-        section?.classList[(section?.classList.contains('opened') ? 'remove' : 'add')]('opened');
-    };
+    const toggleOpenCard = useEventHandler((e, i) => {
+        e.preventDefault();
+        e.stopPropagation();
+
+        components[i].opened = !(components[i].opened ?? false);
+    })
 
     return (
         <>
@@ -136,27 +140,29 @@ export const VisualEditorSidebar = ({onClose, onOpen, onSend}) => {
                 {components.map((builderComponent, i) => {
                     return (
                         <Card key={'builder-component-' + i}>
-                            <Card.Header onClick={toggleOpenCard} >
+                            <Card.Header onClick={toggleOpenCard(i)} style={{ cursor: 'pointer' }} >
                                 <Container>
                                     <Row>
                                         <Col>
-                                            <Card.Title>{builderComponent.title}</Card.Title>
+                                            <Card.Title>
+                                                {builderComponent.title}
+                                            </Card.Title>
                                         </Col>
                                         <Col sm={2}>
                                             <Button variant={'danger'}
-                                                    onClick={() => handleDeleteComponent(i)}>
+                                                    onClick={handleDeleteComponent(i)}>
                                                 <i className={FaIcon.TRASH} />
                                             </Button>
                                         </Col>
                                     </Row>
                                 </Container>
                             </Card.Header>
-                            
-                            <Card.Body style={{ padding: '5px' }}>
+
+                            <Card.Body style={{ padding: '5px', display: (builderComponent.opened ? 'inherit' : 'none') }}>
                                 {(() => {
                                     const Component = builderComponent.builderComponent;
 
-                                    return (<Component {...builderComponent.data} onSend={e => sendComponentData(i, e)} />);
+                                    return (<Component {...builderComponent.data} onSend={sendComponentData(i)} />);
                                 })()}
                             </Card.Body>
                         </Card>
@@ -166,7 +172,7 @@ export const VisualEditorSidebar = ({onClose, onOpen, onSend}) => {
 
             <footer className={footer}>
                 <Button variant={'outline-dark'}
-                        onClick={handleExport}> 
+                        onClick={handleExport}>
                     <i className={FaIcon.EXPORT} /> Export
                 </Button>
 

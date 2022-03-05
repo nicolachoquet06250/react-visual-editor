@@ -62,7 +62,7 @@ export const Repeater = ({title, addLabel, value, onChange, voidModel, children}
     };
 
     return (
-        <Container>
+        <Container fluid={'sm'}>
             <Row>
                 <Col>
                     <h5>
@@ -75,8 +75,8 @@ export const Repeater = ({title, addLabel, value, onChange, voidModel, children}
 
             <Row>
                 <Col style={{ textAlign: 'right' }}>
-                    <Button variant={'outline-dark'} 
-                            onClick={handleAdd} 
+                    <Button variant={'outline-dark'}
+                            onClick={handleAdd}
                             style={{ marginRight: 0 }}>
                         {addLabel}
                     </Button>

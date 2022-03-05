@@ -5,7 +5,7 @@ import {VisualEditorContent} from './content';
 import {visualEditorState, VisualEditorState, VisualEditorStateDispatcher} from '../../context';
 import { AddComponentModal } from "../modals/add-component";
 import 'bootstrap/dist/css/bootstrap.min.css';
-import { useMouse, useToggle, useWindowSize } from 'react-use';
+import { useMouse, useWindowSize } from 'react-use';
 
 const useStyles = createUseStyles({
     visualEditor: {
@@ -126,8 +126,8 @@ export const VisualEditor = ({ layout, registerer, onSend }) => {
                             ref={sidebarRef}>
                         <VisualEditorSidebar onOpen={onOpen} onClose={onClose} onSend={onSend} />
 
-                        <div className={'sidebar-resizer'} 
-                             onMouseDown={() => setResizeState(true)}></div>
+                        <div className={'sidebar-resizer'}
+                             onMouseDown={() => setResizeState(true)} />
                     </aside>
 
                     <section className={content}>
