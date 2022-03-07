@@ -2,6 +2,7 @@ import {useEffect, useState} from "react";
 import {createUseStyles} from "react-jss";
 import {Container, Row, Col} from 'react-bootstrap';
 import {Button} from "react-bootstrap";
+import {repeatComponentFromArray as repeatComponent} from "../../../../hooks/components/repeater";
 
 const useStyles = createUseStyles({
     flexbox: ({justifyContent, alignItems, direction: flexDirection}) => ({
@@ -53,13 +54,15 @@ export const FlexBox = ({children, justifyContent, alignItems, direction}) => {
     );
 };
 
-export const Repeater = ({title, addLabel, value, onChange, voidModel, children}) => {
+export const Repeater = ({title, addLabel, value, onChange, voidModel, children, component}) => {
     const handleAdd = () => {
         onChange && onChange([
             ...value,
             voidModel
         ]);
     };
+
+    const RepeaterComponent = component;
 
     return (
         <Container fluid={'sm'}>
@@ -71,7 +74,7 @@ export const Repeater = ({title, addLabel, value, onChange, voidModel, children}
                 </Col>
             </Row>
 
-            {children}
+            {component ? repeatComponent(value, RepeaterComponent) : children}
 
             <Row>
                 <Col style={{ textAlign: 'right' }}>
