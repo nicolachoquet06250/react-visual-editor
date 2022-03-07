@@ -1,8 +1,7 @@
-import { createContext, useContext, useEffect, useReducer, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { createUseStyles } from 'react-jss';
-import { useFirstMountState, useToggle } from 'react-use';
+import { useFirstMountState } from 'react-use';
 import {Button} from '../buttons';
-import { VisualEditorState, visualEditorState, VisualEditorStateDispatcher } from "../../../../../context";
 import { FaIcon } from "../../../../../enums/icons";
 
 const useStyles = createUseStyles({

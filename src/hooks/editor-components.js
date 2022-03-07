@@ -1,5 +1,4 @@
 import {useGlobalState} from "./context";
-import { useEffect } from "react";
 
 /**
  * @typedef {{ title: String, category: String, builderComponent: Function, uiComponent: Function, data: Record<string, any>, imagePreview: string, recursive: boolean }} CustomComponent
@@ -18,21 +17,35 @@ import { useEffect } from "react";
 export const useComponents = () => {
     const [state, dispatch] = useGlobalState();
 
-    const setComponents = (components) => {
+    const setComponents = components => {
         if (dispatch) {
             dispatch({
-                ...state,
-                components
+                components: [...state.components, ...components]
             });
         }
     };
 
+    const addComponent = component => {
+        const slug = component.title.replace(/\ /g, '-').toLowerCase();
+
+        setComponents([
+            {
+                ...component, 
+                slug, 
+                data: {
+                    ...(component.data ?? {})
+                }
+            }
+        ]);
+    };
+
+    const componentExists = component => state.components.map(c => c.title).indexOf(component.title) !== -1;
+
     const setPageComponents = (pageComponents) => {
         if (dispatch) {
-            state.pageComponents = [...pageComponents];
             dispatch({
-                ...state
-            })
+                pageComponents: [...pageComponents]
+            });
         }
     }
 
@@ -44,14 +57,7 @@ export const useComponents = () => {
          * @param {{builderComponent: (function()), data: {}, title: string, category: string, imagePreview: (function()), recursive: boolean, uiComponent: (function())}} component
          */
         register(component) {
-            if (state.components.map(c => c.title).indexOf(component.title) === -1) {
-                const slug = component.title.replace(/\ /g, '-').toLowerCase();
-
-                setComponents([
-                    ...state.components,
-                    { ...component, slug, data: { ...(component.data ?? {}) } }
-                ]);
-            }
+            !componentExists(component) && addComponent(component);
         },
 
         setData(index, data) {
@@ -71,7 +77,13 @@ export const useComponents = () => {
 
             setPageComponents([
                 ...state.pageComponents,
-                { ...state.components[index], data: { ...(state.components[index].data ?? defaultData) }, opened: true }
+                {
+                    ...state.components[index], 
+                    data: {
+                        ...(state.components[index].data ?? defaultData)
+                    }, 
+                    opened: true
+                }
             ]);
         },
 

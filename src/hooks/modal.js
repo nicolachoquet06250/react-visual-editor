@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import {useGlobalState} from "./context";
 
 /**
@@ -8,29 +9,31 @@ export const useModal = (name) => {
     const [state, dispatch] = useGlobalState();
 
     const setModals = modals => {
-        if (dispatch) {
-            dispatch({
-                ...state,
-                modals
-            })
-        }
+        dispatch({
+            modals: {
+                ...state.modals,
+                ...modals
+            }
+        })
     };
 
-    if (!state.modals[name]) {
-        setModals({
-            ...state.modals,
-            [name]: {
-                opened: false
-            }
-        });
-    }
+    const modalExists = name => Object.keys(state.modals).indexOf(name) !== -1;
+
+    useEffect(() => {
+        if (!modalExists(name)) {
+            setModals({
+                [name]: {
+                    opened: false
+                }
+            });
+        }
+    });
 
     return {
         opened: (state.modals[name]?.opened ?? false),
 
         open() {
             setModals({
-                ...state.modals,
                 [name]: {
                     opened: true
                 }
@@ -39,7 +42,6 @@ export const useModal = (name) => {
 
         close() {
             setModals({
-                ...state.modals,
                 [name]: {
                     opened: false
                 }

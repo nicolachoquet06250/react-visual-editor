@@ -1,12 +1,12 @@
-import { Modal } from "../../utilities/ui/modals";
+import { Modal } from "../utilities/ui/modals";
 import { Button, Nav, Col, Container, Row } from "react-bootstrap";
-import { useComponents, useModal } from "../../../hooks";
-import { Modals } from "../../../enums";
-import { FaIcon } from "../../../enums/icons";
+import { useComponents, useModal } from "../../hooks";
+import { Modals } from "../../enums";
+import { FaIcon } from "../../enums/icons";
 import { Fragment, useState } from "react";
-import { FlexBox } from "../../utilities/ui/boxes";
+import { FlexBox } from "../utilities/ui/boxes";
 import { createUseStyles } from "react-jss";
-import { useSimpleHandler } from "../../../hooks/handlers";
+import { useSimpleHandler } from "../../hooks/handlers";
 
 const useStyles = createUseStyles({
     modal: {

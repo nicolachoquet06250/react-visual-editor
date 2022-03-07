@@ -4,6 +4,7 @@ import {VisualEditorSidebar} from './sidebar';
 import {VisualEditorContent} from './content';
 import {visualEditorState, VisualEditorState, VisualEditorStateDispatcher} from '../../context';
 import { AddComponentModal } from "../modals/add-component";
+import { ValidateDataModal } from "../modals/validate-data";
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { useMouse, useWindowSize } from 'react-use';
 
@@ -94,7 +95,7 @@ export const VisualEditor = ({ layout, registerer, onSend }) => {
     const veRef = useRef();
 
     const sidebarRef = useRef();
-    const {docX} = useMouse(veRef);
+    //const {docX} = useMouse(veRef);
 
     /*useEffect(() => {
         if (resizeState) {
@@ -136,6 +137,7 @@ export const VisualEditor = ({ layout, registerer, onSend }) => {
                 </main>
 
                 <AddComponentModal />
+                <ValidateDataModal />
             </VisualEditorStateDispatcher.Provider>
         </VisualEditorState.Provider>
     );

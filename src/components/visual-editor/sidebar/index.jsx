@@ -1,12 +1,12 @@
 import './index.css';
 import {createUseStyles} from 'react-jss';
 import {FaIcon} from '../../../enums/icons';
-import { useComponents, useModal } from '../../../hooks';
+import { useComponents } from '../../../hooks';
 import { useToggle } from 'react-use';
 import { AddComponentModalButton } from "../../modals/add-component";
-import { Modals } from "../../../enums";
 import { Card, Col, Container, Row, Button } from 'react-bootstrap';
 import { useEventHandler, useSimpleHandler } from "../../../hooks/handlers";
+import {ValidateDataModalButton} from '../../../components/modals/validate-data';
 
 const useStyles = createUseStyles({
     header: {
@@ -77,7 +77,6 @@ export const VisualEditorSidebar = ({onClose, onOpen, onSend}) => {
     const {header, main, footer, openCloseButton} = useStyles();
 
     const [isOpened, toggleOpened] = useToggle(true);
-    const {open} = useModal(Modals.ValidateData);
 
     const handleToggleSidebar = e => {
         e.stopPropagation();
@@ -90,8 +89,6 @@ export const VisualEditorSidebar = ({onClose, onOpen, onSend}) => {
         onSend && onSend({
             data: components.reduce((r, c) => [ ...r, { _name: c.slug, ...(c.data ?? {}) } ], [])
         });
-
-        open();
     };
 
     const sendComponentData = useEventHandler((e, i) => setData(i, e.data));
@@ -176,10 +173,11 @@ export const VisualEditorSidebar = ({onClose, onOpen, onSend}) => {
                     <i className={FaIcon.EXPORT} /> Export
                 </Button>
 
-                <Button variant={'outline-dark'}
+                <ValidateDataModalButton onClick={handleSend} />
+                {/*<Button variant={'outline-dark'}
                         onClick={handleSend}>
                     <i className={FaIcon.SEND} />
-                </Button>
+            </Button>*/}
             </footer>
         </>
     )
