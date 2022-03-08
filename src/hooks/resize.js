@@ -37,7 +37,7 @@ export const useResize = (ref, minWidth) => {
     };
 
     const toggleResizeEvent = (type = 'set') => {
-        eval(`resizeEvents.${type} && resizeEvents.${type}()`)
+        type in resizeEvents && resizeEvents[type]();
     };
 
     useEffect(() => {
