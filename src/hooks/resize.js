@@ -3,7 +3,13 @@ import {useCallback, useEffect, useState} from "react";
 /**
  * @param {React.MutableRefObject<HTMLElement|null>} ref
  * @param {number} minWidth
- * @returns {{onClose(): void, onOpen(): void, animating: boolean, closed: boolean}}
+ * @returns {{
+ * onClose: () => void,
+ * onOpen: () => void,
+ * sidebarWidth: number,
+ * closed: boolean,
+ * startResizing: (...args: any[]) => any
+ * }}
  */
 export const useResize = (ref, minWidth) => {
     const [sidebarClosed, setSidebarClosed] = useState(false);
