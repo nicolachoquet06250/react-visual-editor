@@ -1,3 +1,4 @@
+import React from "react";
 import { useKey } from "react-use";
 import { useModal } from "../../../../hooks";
 import { Modal as BSModal } from 'react-bootstrap';

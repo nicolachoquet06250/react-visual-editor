@@ -1,5 +1,5 @@
 import { useComponents } from "../../../../../hooks";
-import { useEffect } from "react";
+import React, { useEffect } from "react";
 import { useFirstMountState } from "react-use";
 
 export const ComponentList = ({value}) => {

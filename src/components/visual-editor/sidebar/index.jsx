@@ -1,4 +1,5 @@
 import './index.css';
+import React from "react";
 import {createUseStyles} from 'react-jss';
 import {FaIcon} from '../../../enums/icons';
 import { useComponents } from '../../../hooks';
@@ -24,7 +25,6 @@ const useStyles = createUseStyles({
         },
 
         '& button': {
-            borderRadius: '30px',
             transition: 'background-color .2s ease-out, opacity .2s ease-out'
         }
     },
@@ -39,13 +39,9 @@ const useStyles = createUseStyles({
         background: 'rgba(255, 255, 255, .3)',
         transform: 'translateX(calc(100% + 10px))',
 
-        '&:hover': {
-            opacity: 1
-        },
+        '&:hover': {  opacity: 1 },
 
-        '&.close': {
-            transform: 'translateX(calc(100% + 15px))'
-        }
+        '&.close': { transform: 'translateX(calc(100% + 15px))' }
     },
 
     main: {
@@ -109,14 +105,14 @@ export const VisualEditorSidebar = ({onClose, onOpen, onSend}) => {
     const getParentWithClass = (className, root) => {
         return root?.parentElement?.classList?.contains(className) ?
             root?.parentElement : getParentWithClass(className, root?.parentElement);
-    }
+    };
 
     const toggleOpenCard = useEventHandler((e, i) => {
         e.preventDefault();
         e.stopPropagation();
 
         components[i].opened = !(components[i].opened ?? false);
-    })
+    });
 
     return (
         <>
@@ -126,7 +122,6 @@ export const VisualEditorSidebar = ({onClose, onOpen, onSend}) => {
                 </div>
 
                 <Button className={openCloseButton + ` ${isOpened ? 'open' : 'close'}`}
-                        size={'sm'}
                         variant={'outline-dark'}
                         onClick={handleToggleSidebar}>
                     <i className={isOpened ? FaIcon.LOCK : FaIcon.LOCK_OPEN} />
@@ -174,10 +169,6 @@ export const VisualEditorSidebar = ({onClose, onOpen, onSend}) => {
                 </Button>
 
                 <ValidateDataModalButton onClick={handleSend} />
-                {/*<Button variant={'outline-dark'}
-                        onClick={handleSend}>
-                    <i className={FaIcon.SEND} />
-            </Button>*/}
             </footer>
         </>
     )

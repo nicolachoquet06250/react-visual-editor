@@ -54,7 +54,7 @@ export const useContextTabs = () => {
 				setCurrentTab(target);
 
 				onClick && onClick(e)
-			}
+			};
 
 			return (
 				<Button onClick={handleClick} className={{ icon: !!icon }} active={currentTab === target}>

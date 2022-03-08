@@ -45,7 +45,7 @@ const useStyles = createUseStyles({
 });
 
 export const FlexBox = ({children, justifyContent, alignItems, direction}) => {
-    const {flexbox} = useStyles({justifyContent, alignItems, direction})
+    const {flexbox} = useStyles({justifyContent, alignItems, direction});
 
     return (
         <div className={flexbox}>

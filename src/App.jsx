@@ -1,3 +1,4 @@
+import React from "react";
 import { VisualEditorComponentsRegisterer } from "./example/registerer";
 import { VisualEditor } from "./components/visual-editor";
 import { Layout } from "./example/Layout";

@@ -1,20 +1,60 @@
-import { useState } from "react";
+import {useCallback, useEffect, useState} from "react";
 
-export const useResize = () => {
+/**
+ * @param {React.MutableRefObject<HTMLElement|null>} ref
+ * @param {number} minWidth
+ * @returns {{onClose(): void, onOpen(): void, animating: boolean, closed: boolean}}
+ */
+export const useResize = (ref, minWidth) => {
     const [sidebarClosed, setSidebarClosed] = useState(false);
-    const [animating, setAnimating] = useState(false);
+
+    const [sidebarWidth, setSidebarWidth] = useState(minWidth);
+    const [isResizing, setIsResizing] = useState(false);
+    const startResizing = useCallback(() => {
+        setIsResizing(true);
+    }, []);
+    const stopResizing = useCallback(() => {
+        setIsResizing(false);
+    }, []);
+    const resize = useCallback(
+        mouseMoveEvent => {
+            if (isResizing) {
+                setSidebarWidth(mouseMoveEvent.x);
+            }
+        },
+        [isResizing]
+    );
+
+    const resizeEvents = {
+        set() {
+            window.addEventListener("mousemove", resize);
+            window.addEventListener("mouseup", stopResizing);
+        },
+        unset() {
+            window.removeEventListener("mousemove", resize);
+            window.removeEventListener("mouseup", stopResizing);
+        }
+    };
+
+    const toggleResizeEvent = (type = 'set') => {
+        eval(`resizeEvents.${type} && resizeEvents.${type}()`)
+    };
+
+    useEffect(() => {
+        toggleResizeEvent('set');
+        return () => toggleResizeEvent('unset');
+    }, [resize, stopResizing]);
 
     return {
-        animating,
         closed: sidebarClosed,
+        sidebarWidth,
 
         onOpen() {
-            setAnimating(true);
             setSidebarClosed(false);
         },
         onClose() {
-            //setAnimating(false);
             setSidebarClosed(true);
-        }
+        },
+        startResizing
     }
 };
