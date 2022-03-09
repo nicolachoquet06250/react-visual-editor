@@ -1,24 +1,22 @@
-import { SimpleBox } from "../../boxes";
 import { Col, Container, Row, DropdownButton, Dropdown, ButtonGroup } from "react-bootstrap";
 import React, { useEffect, useState } from "react";
 import { useComponents } from "../../../../../hooks";
-import { useFirstMountState } from "react-use";
 
 export const ComponentList = ({defaultComponent, onSend}) => {
 	const {components} = useComponents();
-	const isFirstMount = useFirstMountState();
-	const [chosenComponent, setChosenComponent] = useState('');
-	const [chosenComponentData, setChosenComponentData] = useState();
+	const [chosenComponent, setChosenComponent] = useState(defaultComponent?.slug ?? '');
+	const [chosenComponentData, setChosenComponentData] = useState({
+		...(defaultComponent.data ?? {})
+	});
 	const chosenComponentTitle = components.reduce((r, c) => c.slug === chosenComponent ? c.title : r, 'None');
 
 	const ChosenBuilderComponent = components.reduce((r, c) => c.slug === chosenComponent ? c.builderComponent : r, undefined);
 
-	const sendData = () => {
+	const sendData = data => {
 		onSend({
 			data: {
 				component: {
-					slug: chosenComponent,
-					data: chosenComponentData
+					data: {...data}, slug: chosenComponent
 				}
 			}
 		})
@@ -26,29 +24,37 @@ export const ComponentList = ({defaultComponent, onSend}) => {
 
 	const handleSend = e => {
 		setChosenComponentData(e.data);
-		sendData();
+		sendData(e.data);
+	};
+
+	const getNotRecursiveComponent = () => {
+		const component = components.reduce((r, c) => !r && !c.recursive ? c : r, null);
+		if (!component) {
+			throw new Error('Vous devez enregistrer au moins 1 composant non recursif pour utiliser ce composant UI');
+		}
+
+		return component;
 	};
 
 	useEffect(() => {
-		if (isFirstMount) {
-			if (
-				!defaultComponent ||
-				(typeof defaultComponent === 'object'
-					&& !!Object.keys(defaultComponent).length) === false
-			) {
-				const component = components.reduce((r, c) => !r && !c.recursive ? c : r, null);
-				if (!component) {
-					throw new Error('Vous devez enregistrer au moins 1 composant non recursif pour utiliser ce composant UI');
-				}
-
-				setChosenComponent(component.slug);
-			}
+		if (
+			!defaultComponent ||
+			(typeof defaultComponent === 'object' && !!Object.keys(defaultComponent).length) === false ||
+			(typeof defaultComponent === 'object' && defaultComponent.slug !== '') === false
+		) {
+			const component = getNotRecursiveComponent();
+			setChosenComponent(component.slug);
+		} else {
+			setChosenComponent(defaultComponent.slug);
 		}
 	}, []);
 
 	useEffect(() => {
-		setChosenComponentData(components.reduce((r, c) => c.slug === chosenComponent ? c.data : r, {}));
-		sendData();
+		if (chosenComponent !== '') {
+			const data = components.reduce((r, c) => c.slug === chosenComponent ? c.data : r, {});
+			setChosenComponentData(data);
+			sendData(data);
+		}
 	}, [chosenComponent]);
 
 	return (<Container fluid={'sm'}>
@@ -58,23 +64,18 @@ export const ComponentList = ({defaultComponent, onSend}) => {
 				                id={`dropdown-secondary`}
 				                variant={'outline-secondary'}
 				                title={chosenComponentTitle}>
-					{components.map((component, i) => (
-						<Dropdown.Item eventKey={component.slug}
-						               onClick={() => setChosenComponent(component.slug)}
-						               key={'dropdown-item-' + i}>
+					{components.map((component, i) => (<Dropdown.Item eventKey={component.slug}
+					   onClick={() => setChosenComponent(component.slug)}
+					   key={'dropdown-item-' + i}>
 							{component.title}
-						</Dropdown.Item>
-					))}
+					</Dropdown.Item>))}
 				</DropdownButton>
 			</Col>
 		</Row>
 
 		<Row>
 			<Col>
-				{ChosenBuilderComponent && (
-					<ChosenBuilderComponent data={chosenComponentData}
-					                        onSend={handleSend} />
-				)}
+				{ChosenBuilderComponent && (<ChosenBuilderComponent {...chosenComponentData} onSend={handleSend} />)}
 			</Col>
 		</Row>
 	</Container>);

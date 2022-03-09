@@ -6,6 +6,7 @@ import React, {useEffect, useRef, useState} from "react";
 import { FaIcon } from "../../enums/icons";
 import { ComponentList } from '../../components/utilities/ui/lists/builder';
 import { useEventHandler, useSimpleHandler } from "../../hooks/handlers";
+import {useUniqId} from "../../hooks";
 
 export const MyComponent = ({text, select, texts, selected, component, onSend}) => {
 	const [_text, setText] = useState(text ?? '');
@@ -16,6 +17,7 @@ export const MyComponent = ({text, select, texts, selected, component, onSend}) 
 	const [_component, setComponent] = useState(component ?? {});
 
 	const input = useRef(null);
+	const id = useUniqId();
 
 	useClickAway(input, () => {
 		input.current.blur();
@@ -36,7 +38,7 @@ export const MyComponent = ({text, select, texts, selected, component, onSend}) 
 				select: _select,
 				texts: _texts,
 				selected: _selected,
-				component: _component
+				component: {..._component}
 			}
 		})
 	}, [_text, _select, _texts, _selected, _component]);
@@ -175,7 +177,7 @@ export const MyComponent = ({text, select, texts, selected, component, onSend}) 
 								defaultChecked={_selected}
 								onChange={() => setSelected(!_selected)}
 								type="switch"
-								id="custom-switch"
+								id={"custom-switch-" + id}
 								label="Un switch" />
 						</Form>
 					</Container>
@@ -188,13 +190,13 @@ export const MyComponent = ({text, select, texts, selected, component, onSend}) 
 				</Row>)}
 			</Container>
 
-			<ComponentList defaultComponent={_component} onSend={setComponent} />
+			<ComponentList defaultComponent={_component} onSend={component => {setComponent({...component})}} />
 		</div>
 	);
-}
+};
 
 export const MySecondComponent = () => {
 	return (<h5>
 		Mon decond composant
 	</h5>);
-}
+};

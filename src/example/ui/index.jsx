@@ -1,4 +1,3 @@
-import { JsonDebugger } from "../../components/utilities/debug";
 import { ComponentList } from "../../components/utilities/ui/lists/ui";
 
 export const MyComponent = ({
@@ -22,9 +21,8 @@ export const MyComponent = ({
 		<div>
 			selected: {selected ? '😁' : '😥'}
 		</div>
+		<div> <hr /> </div>
 		<div>
-			{/*<JsonDebugger json={component} />*/}
-
 			<ComponentList value={component?.data?.component ?? {}} />
 		</div>
 	</>
@@ -36,4 +34,4 @@ export const MySecondComponent = () => {
 			Coucou à toi Jeune Padawan 😆
 		</span>
 	);
-}
+};
