@@ -8,5 +8,7 @@ export const FaIcon = {
 	CLOSE: 'fa-solid fa-xmark',
 	TRASH: 'fa-solid fa-trash',
 	PLUS: 'fa-solid fa-plus',
-	DROPDOWN_ARROW: 'fa-solid fa-caret-down'
+	DROPDOWN_ARROW: 'fa-solid fa-caret-down',
+	ARROW_UP: 'fa-solid fa-angle-up',
+	ARROW_DOWN: 'fa-solid fa-angle-down'
 };

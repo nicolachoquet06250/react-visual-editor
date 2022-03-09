@@ -47,11 +47,15 @@ export const useComponents = () => {
                 pageComponents: [...pageComponents]
             });
         }
-    }
+    };
 
     return {
         components: state.components,
         pageComponents: state.pageComponents,
+
+        togglePageComponentOpen(index) {
+            setPageComponents(state.pageComponents.map((c, i) => i === index ? {...c, opened: !c.opened} : c));
+        },
 
         /**
          * @param {{builderComponent: (function()), data: {}, title: string, category: string, imagePreview: (function()), recursive: boolean, uiComponent: (function())}} component

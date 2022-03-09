@@ -68,7 +68,7 @@ const useStyles = createUseStyles({
 });
 
 export const VisualEditorSidebar = ({onClose, onOpen, onSend}) => {
-    const {pageComponents: components, setData, unregisterFromPage: unregisterComponent} = useComponents();
+    const {pageComponents: components, togglePageComponentOpen, setData, unregisterFromPage: unregisterComponent} = useComponents();
 
     const {header, main, footer, openCloseButton} = useStyles();
 
@@ -107,12 +107,12 @@ export const VisualEditorSidebar = ({onClose, onOpen, onSend}) => {
             root?.parentElement : getParentWithClass(className, root?.parentElement);
     };
 
-    const toggleOpenCard = useEventHandler((e, i) => {
+    const toggleOpenCard = i => e => {
         e.preventDefault();
         e.stopPropagation();
 
-        components[i].opened = !(components[i].opened ?? false);
-    });
+        togglePageComponentOpen(i);
+    };
 
     return (
         <>
@@ -131,8 +131,8 @@ export const VisualEditorSidebar = ({onClose, onOpen, onSend}) => {
             <main className={main}>
                 {components.map((builderComponent, i) => {
                     return (
-                        <Card key={'builder-component-' + i}>
-                            <Card.Header onClick={toggleOpenCard(i)} style={{ cursor: 'pointer' }} >
+                        <Card key={'builder-component-' + i} style={{marginBottom: '5px'}}>
+                            <Card.Header>
                                 <Container>
                                     <Row>
                                         <Col>
@@ -140,7 +140,13 @@ export const VisualEditorSidebar = ({onClose, onOpen, onSend}) => {
                                                 {builderComponent.title}
                                             </Card.Title>
                                         </Col>
-                                        <Col sm={2}>
+                                        <Col sm={2} style={{display: 'flex', flexDirection: 'row', justifyContent: 'center', alignItems: 'center'}}>
+                                            <Button variant={'outline-dark'}
+                                                    onClick={toggleOpenCard(i)}>
+                                                <i className={builderComponent.opened ? FaIcon.ARROW_UP : FaIcon.ARROW_DOWN} />
+                                            </Button>
+                                        </Col>
+                                        <Col sm={2} style={{display: 'flex', flexDirection: 'row', justifyContent: 'center', alignItems: 'center'}}>
                                             <Button variant={'danger'}
                                                     onClick={handleDeleteComponent(i)}>
                                                 <i className={FaIcon.TRASH} />
