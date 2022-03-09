@@ -1,7 +1,8 @@
 import { Repeater } from "../../components/utilities/ui/boxes";
 import { Col, Container, Row, DropdownButton, Dropdown, ButtonGroup, Button, Nav, Form } from "react-bootstrap";
+import {useClickAway} from 'react-use';
 import wording from './wording';
-import { useEffect, useState } from "react";
+import React, {useEffect, useRef, useState} from "react";
 import { FaIcon } from "../../enums/icons";
 import { ComponentList } from '../../components/utilities/ui/lists/builder';
 import { useEventHandler, useSimpleHandler } from "../../hooks/handlers";
@@ -14,13 +15,19 @@ export const MyComponent = ({text, select, texts, selected, component, onSend}) 
 	const [_selected, setSelected] = useState(selected ?? false);
 	const [_component, setComponent] = useState(component ?? {});
 
+	const input = useRef(null);
+
+	useClickAway(input, () => {
+		input.current.blur();
+	});
+
 	const [currentTab, setCurrentTab] = useState('coucou');
 
 	const deleteText = useSimpleHandler(index =>
 		setTexts(_texts.reduce((r, c, i) => index === i ? r : [...r, c], [])));
 
 	const updateText = useEventHandler((e, i) =>
-		setTexts(_texts.map((c, index) => i === index ? e.target.value : c)))
+		setTexts(_texts.map((c, index) => i === index ? e.target.value : c)));
 
 	useEffect(() => {
 		onSend({
@@ -32,14 +39,11 @@ export const MyComponent = ({text, select, texts, selected, component, onSend}) 
 				component: _component
 			}
 		})
-	}, [_text, _select, _texts, _selected, _component])
+	}, [_text, _select, _texts, _selected, _component]);
 
-	const DeleteButton = ({i}) => (
-		<Button variant={'outline-danger'}
-		        onClick={deleteText(i)}>
-			<i className={FaIcon.TRASH} />
-		</Button>
-	);
+	const DeleteButton = ({i}) => (<Button variant={'outline-danger'} onClick={deleteText(i)}>
+		<i className={FaIcon.TRASH} />
+	</Button>);
 
 	return (
 		<div>
@@ -55,7 +59,13 @@ export const MyComponent = ({text, select, texts, selected, component, onSend}) 
 								<Form.Control type="text"
 								              placeholder={wording.input.placeholder}
 								              value={_text}
-								              onChange={e => setText(e.target.value)} />
+								              onChange={e => setText(e.target.value)}
+											  onClick={e => e.target.focus()}
+											  ref={input} onKeyDown={e => {
+												if (e.code === 'Escape') {
+													e.target.blur()
+												}
+											  }}/>
 							</Form.Group>
 						</Form>
 					</Col>
@@ -105,7 +115,13 @@ export const MyComponent = ({text, select, texts, selected, component, onSend}) 
 							<Form.Control type="text"
 							              placeholder={wording.repeater.input.placeholder}
 							              value={_texts[i]}
-							              onChange={updateText(i)} />
+							              onChange={updateText(i)}
+										  onClick={e => e.target.focus()}
+										  onKeyDown={e => {
+										  	if (e.code === 'Escape') {
+										  		e.target.blur();
+											}
+										  }}/>
 						</Form.Group>
 					</Col>
 
