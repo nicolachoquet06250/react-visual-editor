@@ -14,6 +14,7 @@ export const useStyles = createUseStyles({
 
     sidebar: props => ({
         minWidth: props?.minSidebarWidth ?? '0px',
+        maxWidth: 'calc(100% - 250px)',
         width: props?.cssResizerWidth ?? props.minSidebarWidth,
         height: props.sidebarHeight,
         display: 'flex',
@@ -60,6 +61,7 @@ export const useStyles = createUseStyles({
         overflowY: 'auto',
         height: '100%',
         width: `calc(100% - ${props.cssResizerWidth ?? props.minSidebarWidth} - 1px)`,
+        minWidth: `calc(100% - ${props.maxSidebarWidth})`,
         transform: 'translateX(0px)',
         transition: 'transform .3s ease-out',
 

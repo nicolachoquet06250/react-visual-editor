@@ -30,8 +30,10 @@ export const MyComponent = ({
 
 export const MySecondComponent = () => {
 	return (
-		<span>
-			Coucou à toi Jeune Padawan 😆
-		</span>
+		<div>
+			<span>
+				Coucou à toi Jeune Padawan 😆
+			</span>
+		</div>
 	);
 };

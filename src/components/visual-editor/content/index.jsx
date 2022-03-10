@@ -1,14 +1,19 @@
 import React from "react";
 import {useComponents} from "../../../hooks";
 import {useStyles} from "../style";
+import {useWindowSize} from "react-use";
 
 export const VisualEditorContent = ({ layout, sidebarWidth, sidebarMinWidth }) => {
     const Layout = layout;
+    const {width} = useWindowSize();
 
-    const {content} = useStyles({
+    const styleProps = {
         minSidebarWidth: sidebarMinWidth + 'px',
+        maxSidebarWidth: (width - 250) + 'px',
         cssResizerWidth: sidebarWidth + 'px'
-    });
+    };
+
+    const {content} = useStyles(styleProps);
 
     const { pageComponents: components } = useComponents();
 

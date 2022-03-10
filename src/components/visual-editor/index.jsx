@@ -14,16 +14,19 @@ export const VisualEditor = ({ layout, registerer, onSend }) => {
 
     const {state, dispatch} = useStateReducer();
 
-    const {height: pageHeight} = useWindowSize();
+    const {height: pageHeight, width: pageWidth} = useWindowSize();
 
     const sidebarMinWidth = 300;
     const [sidebarWidth, setSidebarWidth] = useState(sidebarMinWidth);
 
-    const {visualEditor} = useStyles({
+    const styleProps = {
         minSidebarWidth: sidebarMinWidth + 'px',
+        maxSidebarWidth: (pageWidth - 250) + 'px',
         cssResizerWidth: sidebarWidth + 'px',
         sidebarHeight: pageHeight + 'px'
-    });
+    };
+
+    const {visualEditor} = useStyles(styleProps);
 
     return (
         <VisualEditorState.Provider value={state}>

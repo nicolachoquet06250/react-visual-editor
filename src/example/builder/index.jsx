@@ -48,150 +48,154 @@ export const MyComponent = ({text, select, texts, selected, component, onSend}) 
 	</Button>);
 
 	return (
-		<div>
-			<Container fluid={'sm'}>
-				<Row>
-					<Col>
-						<Form>
-							<Form.Group className="mb-3" controlId="exampleForm.ControlInput1">
-								<Form.Label>
-									{wording.input.title}
-								</Form.Label>
+		<Container style={{padding: 0}}>
+			<Row>
+				<Col>
+					<Container fluid={'sm'}>
+						<Row>
+							<Col>
+								<Form>
+									<Form.Group className="mb-3" controlId="exampleForm.ControlInput1">
+										<Form.Label>
+											{wording.input.title}
+										</Form.Label>
 
-								<Form.Control type="text"
-								              placeholder={wording.input.placeholder}
-								              value={_text}
-								              onChange={e => setText(e.target.value)}
-											  onClick={e => e.target.focus()}
-											  ref={input} onKeyDown={e => {
-												if (e.code === 'Escape') {
-													e.target.blur()
-												}
-											  }}/>
-							</Form.Group>
-						</Form>
-					</Col>
+										<Form.Control type="text"
+													  placeholder={wording.input.placeholder}
+													  value={_text}
+													  onChange={e => setText(e.target.value)}
+													  onClick={e => e.target.focus()}
+													  ref={input} onKeyDown={e => {
+														if (e.code === 'Escape') {
+															e.target.blur()
+														}
+													  }}/>
+									</Form.Group>
+								</Form>
+							</Col>
 
-					<Col>
-						<h6>{wording.test_text.title}</h6>
-						<span>{wording.test_text.text}</span>
-					</Col>
-				</Row>
+							<Col>
+								<h6>{wording.test_text.title}</h6>
+								<span>{wording.test_text.text}</span>
+							</Col>
+						</Row>
 
-				<Row>
-					<Col>
-						<DropdownButton as={ButtonGroup} id={`dropdown-secondary`}
-										variant={'outline-secondary'} title={_selectLabel}>
-							<Dropdown.Item eventKey="toto"
-							               onClick={() => {
-											   setSelect('toto');
-											   setSelectLabel('Toto');
-										   }}>
-								Toto
-							</Dropdown.Item>
-							<Dropdown.Item eventKey="titi"
-							               onClick={() => {
-											   setSelect('titi');
-											   setSelectLabel('Titi');
-										   }}>
-								Titi
-							</Dropdown.Item>
-							<Dropdown.Item eventKey="tata"
-							               onClick={() => {
-											   setSelect('tata');
-											   setSelectLabel('Tata');
-										   }}>
-								Tata
-							</Dropdown.Item>
-						</DropdownButton>
-					</Col>
-				</Row>
-			</Container>
-
-			<Repeater title={'Repeater component title'} addLabel={'Add text'}
-			          value={_texts} voidModel={''}
-			          onChange={setTexts}>
-				{_texts.map((_, i) => (<Row style={{ marginBottom: '5px' }} key={'repeater-row-' + i}>
-					<Col>
-						<Form.Group className="mb-3" controlId="exampleForm.ControlInput1">
-							<Form.Control type="text"
-							              placeholder={wording.repeater.input.placeholder}
-							              value={_texts[i]}
-							              onChange={updateText(i)}
-										  onClick={e => e.target.focus()}
-										  onKeyDown={e => {
-										  	if (e.code === 'Escape') {
-										  		e.target.blur();
-											}
-										  }}/>
-						</Form.Group>
-					</Col>
-
-					<Col sm={3} style={{ textAlign: 'right' }}>
-						<DeleteButton i={i} />
-					</Col>
-				</Row>))}
-			</Repeater>
-
-			<Container fluid={'sm'}>
-				<Row>
-					<Col>
-						<hr />
-					</Col>
-				</Row>
-			</Container>
-
-			<Container fluid={'sm'}>
-				<Row>
-					<Col>
-						<Nav justify variant="tabs" defaultActiveKey={"coucou"}>
-							<Nav.Item>
-								<Nav.Link href={'coucou'}
-										  onClick={e => {
-											  e.preventDefault();
-											  setCurrentTab('coucou')
-										  }}>
-									Coucou
-								</Nav.Link>
-							</Nav.Item>
-
-							<Nav.Item>
-								<Nav.Link href={'coucou2'}
-										  onClick={e => {
-											  e.preventDefault();
-											  setCurrentTab('coucou2')
-										  }}>
-									Coucou 2
-								</Nav.Link>
-							</Nav.Item>
-						</Nav>
-					</Col>
-				</Row>
-
-				{currentTab === 'coucou' && (<Row>
-					<Container>
-						Coucou
-
-						<Form>
-							<Form.Check
-								defaultChecked={_selected}
-								onChange={() => setSelected(!_selected)}
-								type="switch"
-								id={"custom-switch-" + id}
-								label="Un switch" />
-						</Form>
+						<Row>
+							<Col>
+								<DropdownButton as={ButtonGroup} id={`dropdown-secondary`}
+												variant={'outline-secondary'} title={_selectLabel}>
+									<Dropdown.Item eventKey="toto"
+												   onClick={() => {
+													   setSelect('toto');
+													   setSelectLabel('Toto');
+												   }}>
+										Toto
+									</Dropdown.Item>
+									<Dropdown.Item eventKey="titi"
+												   onClick={() => {
+													   setSelect('titi');
+													   setSelectLabel('Titi');
+												   }}>
+										Titi
+									</Dropdown.Item>
+									<Dropdown.Item eventKey="tata"
+												   onClick={() => {
+													   setSelect('tata');
+													   setSelectLabel('Tata');
+												   }}>
+										Tata
+									</Dropdown.Item>
+								</DropdownButton>
+							</Col>
+						</Row>
 					</Container>
-				</Row>)}
 
-				{currentTab === 'coucou2' && (<Row>
-					<Container>
-						Coucou 2
+					<Repeater title={'Repeater component title'} addLabel={'Add text'}
+							  value={_texts} voidModel={''}
+							  onChange={setTexts}>
+						{_texts.map((_, i) => (<Row style={{ marginBottom: '5px' }} key={'repeater-row-' + i}>
+							<Col>
+								<Form.Group className="mb-3" controlId="exampleForm.ControlInput1">
+									<Form.Control type="text"
+												  placeholder={wording.repeater.input.placeholder}
+												  value={_texts[i]}
+												  onChange={updateText(i)}
+												  onClick={e => e.target.focus()}
+												  onKeyDown={e => {
+													if (e.code === 'Escape') {
+														e.target.blur();
+													}
+												  }}/>
+								</Form.Group>
+							</Col>
+
+							<Col sm={3} style={{ textAlign: 'right' }}>
+								<DeleteButton i={i} />
+							</Col>
+						</Row>))}
+					</Repeater>
+
+					<Container fluid={'sm'}>
+						<Row>
+							<Col>
+								<hr />
+							</Col>
+						</Row>
 					</Container>
-				</Row>)}
-			</Container>
 
-			<ComponentList defaultComponent={_component} onSend={component => {setComponent({...component})}} />
-		</div>
+					<Container fluid={'sm'}>
+						<Row>
+							<Col>
+								<Nav justify variant="tabs" defaultActiveKey={"coucou"}>
+									<Nav.Item>
+										<Nav.Link href={'coucou'}
+												  onClick={e => {
+													  e.preventDefault();
+													  setCurrentTab('coucou')
+												  }}>
+											Coucou
+										</Nav.Link>
+									</Nav.Item>
+
+									<Nav.Item>
+										<Nav.Link href={'coucou2'}
+												  onClick={e => {
+													  e.preventDefault();
+													  setCurrentTab('coucou2')
+												  }}>
+											Coucou 2
+										</Nav.Link>
+									</Nav.Item>
+								</Nav>
+							</Col>
+						</Row>
+
+						{currentTab === 'coucou' && (<Row>
+							<Container>
+								Coucou
+
+								<Form>
+									<Form.Check
+										defaultChecked={_selected}
+										onChange={() => setSelected(!_selected)}
+										type="switch"
+										id={"custom-switch-" + id}
+										label="Un switch" />
+								</Form>
+							</Container>
+						</Row>)}
+
+						{currentTab === 'coucou2' && (<Row>
+							<Container>
+								Coucou 2
+							</Container>
+						</Row>)}
+					</Container>
+
+					<ComponentList defaultComponent={_component} onSend={component => {setComponent({...component})}} />
+				</Col>
+			</Row>
+		</Container>
 	);
 };
 
