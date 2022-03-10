@@ -79,24 +79,24 @@ export const ComponentList = ({defaultComponent, onSend}) => {
 						</DropdownButton>
 					</Col>
 
-					<Col sm={2} style={{display: 'flex', flexDirection: 'row', justifyContent: 'flex-end', alignItems: 'center'}}>
+					{ChosenBuilderComponent && (<Col sm={2} style={{display: 'flex', flexDirection: 'row', justifyContent: 'flex-end', alignItems: 'center'}}>
 						<Button variant={'outline-dark'}
 								onClick={toggleCardOpened}>
 							<i className={cardOpened ? FaIcon.ARROW_UP : FaIcon.ARROW_DOWN} />
 						</Button>
-					</Col>
+					</Col>)}
 				</Row>
 			</Container>
 		</Card.Header>
 
-		<Card.Body style={{ display: (cardOpened ? 'inherit' : 'none') }}>
+		{ChosenBuilderComponent && (<Card.Body style={{ display: (cardOpened ? 'inherit' : 'none') }}>
 			<Container fluid={'sm'}>
 				<Row>
 					<Col>
-						{ChosenBuilderComponent && (<ChosenBuilderComponent {...chosenComponentData} onSend={handleSend} />)}
+						<ChosenBuilderComponent {...chosenComponentData} onSend={handleSend} />
 					</Col>
 				</Row>
 			</Container>
-		</Card.Body>
+		</Card.Body>)}
 	</Card>);
 };
