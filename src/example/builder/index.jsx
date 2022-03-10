@@ -83,7 +83,7 @@ export const MyComponent = ({text, select, texts, selected, component, onSend}) 
 						<Row>
 							<Col>
 								<DropdownButton as={ButtonGroup} id={`dropdown-secondary`}
-												variant={'outline-secondary'} title={_selectLabel}>
+												variant={'outline-dark'} title={_selectLabel}>
 									<Dropdown.Item eventKey="toto"
 												   onClick={() => {
 													   setSelect('toto');
