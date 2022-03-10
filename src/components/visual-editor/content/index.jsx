@@ -10,7 +10,8 @@ export const VisualEditorContent = ({ layout, sidebarWidth, sidebarMinWidth }) =
     const styleProps = {
         minSidebarWidth: sidebarMinWidth + 'px',
         maxSidebarWidth: (width - 250) + 'px',
-        cssResizerWidth: sidebarWidth + 'px'
+        cssResizerWidth: sidebarWidth + 'px',
+        pageWidth: width
     };
 
     const {content} = useStyles(styleProps);

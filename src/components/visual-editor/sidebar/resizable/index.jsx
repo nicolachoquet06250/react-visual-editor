@@ -6,7 +6,7 @@ import {useStyles} from "../../style";
 export const VisualEditorResizableSidebar = ({minWidth, onSend, onSidebarWidthChange, sidebar: sidebarComponent}) => {
     const Sidebar = sidebarComponent;
 
-    const {height: pageHeight} = useWindowSize();
+    const {height: pageHeight, width: pageWidth} = useWindowSize();
 
     /**
      * @type {React.MutableRefObject<HTMLElement|null>}
@@ -18,11 +18,14 @@ export const VisualEditorResizableSidebar = ({minWidth, onSend, onSidebarWidthCh
         onSidebarWidthChange && onSidebarWidthChange(sidebarWidth)
     }, [sidebarWidth]);
 
-    const {sidebar} = useStyles({
+    const styleProps = {
         minSidebarWidth: minWidth + 'px',
         cssResizerWidth: sidebarWidth + 'px',
-        sidebarHeight: pageHeight + 'px'
-    });
+        sidebarHeight: pageHeight + 'px',
+        pageWidth
+    };
+
+    const {sidebar} = useStyles(styleProps);
 
     return (<aside className={sidebar + ' ' + (closed ? 'closed' : '')}
                    ref={sidebarRef}

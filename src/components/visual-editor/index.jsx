@@ -23,7 +23,8 @@ export const VisualEditor = ({ layout, registerer, onSend }) => {
         minSidebarWidth: sidebarMinWidth + 'px',
         maxSidebarWidth: (pageWidth - 250) + 'px',
         cssResizerWidth: sidebarWidth + 'px',
-        sidebarHeight: pageHeight + 'px'
+        sidebarHeight: pageHeight + 'px',
+        pageWidth
     };
 
     const {visualEditor} = useStyles(styleProps);

@@ -13,9 +13,9 @@ export const useStyles = createUseStyles({
     },
 
     sidebar: props => ({
-        minWidth: props?.minSidebarWidth ?? '0px',
+        minWidth: props.minSidebarWidth,
         maxWidth: 'calc(100% - 250px)',
-        width: props?.cssResizerWidth ?? props.minSidebarWidth,
+        width: props.cssResizerWidth,
         height: props.sidebarHeight,
         display: 'flex',
         flexDirection: 'column',
@@ -26,12 +26,14 @@ export const useStyles = createUseStyles({
         transition: 'transform .3s ease-out',
         zIndex: 2,
         '&.closed': {
-            transform: 'translateX(-100%)',
+            transform: `translateX(-100%)`,
 
             '& ~ section': {
-                width: '100%!important',
+                width: `${props.pageWidth}px`,
+                maxWidth: `${props.pageWidth}px`,
                 height: '100vh',
-                transform: `translateX(-${props?.cssResizerWidth ?? '0px'})`
+                position: 'absolute',
+                left: '0px'
             },
 
             '& > .sidebar-resizer': {
@@ -41,7 +43,6 @@ export const useStyles = createUseStyles({
 
         '& > .sidebar-resizer': {
             position: 'absolute',
-            //background: 'red',
             right: '-5px',
             top: 0,
             bottom: 0,
@@ -57,13 +58,13 @@ export const useStyles = createUseStyles({
         }
     }),
 
-    content: (props) => ({
+    content: props => ({
         overflowY: 'auto',
         height: '100%',
         width: `calc(100% - ${props.cssResizerWidth ?? props.minSidebarWidth} - 1px)`,
         minWidth: `calc(100% - ${props.maxSidebarWidth})`,
-        transform: 'translateX(0px)',
-        transition: 'transform .3s ease-out',
+        transition: 'left .3s ease-out',
+        left: props.cssResizerWidth,
 
         '& > main': {
             padding: '5px'
