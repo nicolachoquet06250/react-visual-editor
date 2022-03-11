@@ -17,6 +17,7 @@ export const MyComponent = ({text, select, texts, selected, component, onSend}) 
 	const [_component, setComponent] = useState(component ?? {});
 
 	const input = useRef(null);
+	const [focusedInputs, setFocusedInputs] = useState([]);
 	const id = useUniqId();
 
 	useClickAway(input, () => {
@@ -25,11 +26,11 @@ export const MyComponent = ({text, select, texts, selected, component, onSend}) 
 
 	const [currentTab, setCurrentTab] = useState('coucou');
 
-	const deleteText = useSimpleHandler(index =>
-		setTexts(_texts.reduce((r, c, i) => index === i ? r : [...r, c], [])));
+	const updateText = i => e => setTexts(_texts.map((c, index) => i === index ? e.target.value : c));
 
-	const updateText = useEventHandler((e, i) =>
-		setTexts(_texts.map((c, index) => i === index ? e.target.value : c)));
+	useEffect(() => {
+		setFocusedInputs(_texts.map((_, i) => focusedInputs[i] ?? false));
+	}, [_texts]);
 
 	useEffect(() => {
 		onSend({
@@ -43,9 +44,62 @@ export const MyComponent = ({text, select, texts, selected, component, onSend}) 
 		})
 	}, [_text, _select, _texts, _selected, _component]);
 
-	const DeleteButton = ({i}) => (<Button variant={'outline-danger'} onClick={deleteText(i)}>
-		<i className={FaIcon.TRASH} />
-	</Button>);
+	const DeleteButton = ({i, onClick}) => {
+		const deleteText = e => {
+			setTexts(_texts.reduce((r, c, index) => i === index ? r : [...r, c], []));
+
+			onClick && onClick(e);
+		};
+
+		return (<Button variant={'outline-danger'} onClick={deleteText} data-action={'delete-item'} data-i={i}>
+			<i className={FaIcon.TRASH} />
+		</Button>);
+	};
+
+	const RepeaterInput = ({i}) => {
+		const localInput = useRef(null);
+
+		useClickAway(localInput, e => {
+			if (focusedInputs[i]) {
+				setFocusedInputs(focusedInputs.map((focused, index) => i === index ? false : focused));
+
+				if (
+					e.target.tagName.toLowerCase() === 'button' &&
+					e.target.hasAttribute('data-action') &&
+					e.target.getAttribute('data-action') === 'delete-item'
+				) {
+					setTexts(_texts.reduce((r, c, index) => parseInt(e.target.getAttribute('data-i')) === index ? r : [...r, c], []));
+				}
+			}
+		});
+
+		useEffect(() => {
+			if (focusedInputs[i]) localInput.current.focus();
+			else localInput.current.blur();
+		}, [focusedInputs[i]]);
+
+		const handleClick = () => {
+			setFocusedInputs(focusedInputs.map((focused, index) => i === index ? true : focused));
+		};
+
+		const handleKeyDown = e => {
+			if (e.code === 'Escape') {
+				setFocusedInputs(focusedInputs.map((focused, index) => i === index ? false : focused));
+			}
+		};
+
+		const handleChange = updateText(i);
+
+		return (<Form.Group className="mb-3" controlId="exampleForm.ControlInput1">
+			<Form.Control type="text"
+						  ref={localInput}
+						  placeholder={wording.repeater.input.placeholder}
+						  value={_texts[i]}
+						  onChange={handleChange}
+						  onClick={handleClick}
+						  onKeyDown={handleKeyDown}/>
+		</Form.Group>);
+	};
 
 	return (
 		<Container style={{padding: 0}}>
@@ -66,9 +120,7 @@ export const MyComponent = ({text, select, texts, selected, component, onSend}) 
 													  onChange={e => setText(e.target.value)}
 													  onClick={e => e.target.focus()}
 													  ref={input} onKeyDown={e => {
-														if (e.code === 'Escape') {
-															e.target.blur()
-														}
+														if (e.code === 'Escape') e.target.blur();
 													  }}/>
 									</Form.Group>
 								</Form>
@@ -115,18 +167,7 @@ export const MyComponent = ({text, select, texts, selected, component, onSend}) 
 							  onChange={setTexts}>
 						{_texts.map((_, i) => (<Row style={{ marginBottom: '5px' }} key={'repeater-row-' + i}>
 							<Col>
-								<Form.Group className="mb-3" controlId="exampleForm.ControlInput1">
-									<Form.Control type="text"
-												  placeholder={wording.repeater.input.placeholder}
-												  value={_texts[i]}
-												  onChange={updateText(i)}
-												  onClick={e => e.target.focus()}
-												  onKeyDown={e => {
-													if (e.code === 'Escape') {
-														e.target.blur();
-													}
-												  }}/>
-								</Form.Group>
+								<RepeaterInput i={i} />
 							</Col>
 
 							<Col sm={3} style={{ textAlign: 'right' }}>
